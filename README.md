@@ -1,2 +1,4 @@
-# sitewhere-integration
-Repository of SiteWhere third-party integration libraries
+# SiteWhere Integration Libraries
+Repository of SiteWhere third-party integration libraries used by microservices to 
+interact with external systems.
+

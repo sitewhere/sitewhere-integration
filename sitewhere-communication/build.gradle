@@ -1,0 +1,81 @@
+description = 'SiteWhere Common Protocol Components'
+version = '3.0.0.alpha1'
+
+dependencies {
+	// SiteWhere microservice library.	
+    compile group: 'com.sitewhere', name: 'sitewhere-core', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
+    
+     // Protobuf device API.
+    compile group: 'com.sitewhere', name: 'sitewhere-device-protobuf', version:'2.0.1'
+    
+     // CoAP dependencies.
+    compile group: 'org.eclipse.californium', name: 'californium-core', version:'1.0.4'
+    
+    // MQTT dependencies.
+    compile group: 'org.fusesource.mqtt-client', name: 'mqtt-client', version:'1.12'
+    compile group: 'org.fusesource.hawtdispatch', name: 'hawtdispatch', version:'1.22'
+	
+	compile group: 'com.google.protobuf', name: 'protobuf-java', version: "${rootProject.ext['protobuf.version']}"
+}
+
+test {
+    exclude '**/*'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+// Publish jar.	
+apply plugin: 'maven-publish'
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+		    from components.java
+            artifact sourcesJar
+            artifact javadocJar
+			pom {
+			    name = 'SiteWhere Common Protocol Integration'
+			    description = 'SiteWhere Common Protocol Integration'
+			    url = 'http://sitewhere.io'
+			    licenses {
+			        license {
+			            name = 'CPAL-1.0'
+			            url = 'https://opensource.org/licenses/CPAL-1.0'
+			        }
+			    }
+                developers {
+                    developer {
+                        id = 'admin'
+                        name = 'SiteWhere Admin'
+                        email = 'admin@sitewhere.com'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/sitewhere/sitewhere-integration.git'
+                    url = 'https://github.com/sitewhere/sitewhere-integration'
+                }
+			}	
+		}
+	}
+    repositories {
+        maven {
+            url project.nexusUrl
+            credentials {
+                username project.nexusUsername
+                password project.nexusPassword
+            }
+        }
+    }
+}
+
+apply plugin: 'signing'
+signing {
+    sign publishing.publications.mavenJava
+}

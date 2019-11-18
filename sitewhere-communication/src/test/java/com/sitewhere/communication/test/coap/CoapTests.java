@@ -20,7 +20,7 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sitewhere.common.MarshalUtils;
+import com.sitewhere.microservice.util.MarshalUtils;
 import com.sitewhere.rest.model.device.event.request.DeviceAlertCreateRequest;
 import com.sitewhere.rest.model.device.event.request.DeviceCommandResponseCreateRequest;
 import com.sitewhere.rest.model.device.event.request.DeviceLocationCreateRequest;

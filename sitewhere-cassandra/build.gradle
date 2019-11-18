@@ -1,9 +1,9 @@
 description = 'SiteWhere Cassandra Library'
-version = '3.0.0.alpha1'
+version = '3.0.0.alpha2'
 
 dependencies {
-	// SiteWhere core component library.	
-    compile group: 'com.sitewhere', name: 'sitewhere-core', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
+	// SiteWhere microservice library.	
+    compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
     
     compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version:'3.4.0'
 }

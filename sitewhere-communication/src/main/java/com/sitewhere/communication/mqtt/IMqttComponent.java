@@ -7,7 +7,7 @@
  */
 package com.sitewhere.communication.mqtt;
 
-import com.sitewhere.spi.server.lifecycle.ILifecycleComponent;
+import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponent;
 
 /**
  * Allows MQTT settings to be configured consistently across components.

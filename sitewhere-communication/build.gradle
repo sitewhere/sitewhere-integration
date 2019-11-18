@@ -1,9 +1,9 @@
 description = 'SiteWhere Common Protocol Components'
-version = '3.0.0.alpha1'
+version = '3.0.0.alpha2'
 
 dependencies {
 	// SiteWhere microservice library.	
-    compile group: 'com.sitewhere', name: 'sitewhere-core', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
+    compile group: 'com.sitewhere', name: 'sitewhere-microservice-api', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
     
      // Protobuf device API.
     compile group: 'com.sitewhere', name: 'sitewhere-device-protobuf', version:'2.0.1'

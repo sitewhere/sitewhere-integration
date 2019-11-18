@@ -12,12 +12,12 @@ import com.datastax.driver.core.HostDistance;
 import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.QueryExecutionException;
-import com.sitewhere.server.lifecycle.TenantEngineLifecycleComponent;
-import com.sitewhere.server.lifecycle.parameters.StringComponentParameter;
+import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
+import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.server.lifecycle.IDiscoverableTenantLifecycleComponent;
-import com.sitewhere.spi.server.lifecycle.ILifecycleComponentParameter;
-import com.sitewhere.spi.server.lifecycle.ILifecycleProgressMonitor;
+import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
+import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
+import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 
 /**
  * Client used for connecting to and interacting with an Apache Cassandra

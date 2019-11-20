@@ -1,5 +1,5 @@
 description = 'SiteWhere Cassandra Library'
-version = '3.0.0.alpha2'
+version = '3.0.0.alpha3'
 
 dependencies {
 	// SiteWhere microservice library.	

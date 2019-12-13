@@ -1,5 +1,4 @@
 description = 'SiteWhere Solr Implementation'
-version = '3.0.0.alpha3'
 
 dependencies {
 	// SiteWhere microservice library.	

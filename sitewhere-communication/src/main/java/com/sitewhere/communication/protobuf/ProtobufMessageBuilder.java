@@ -23,7 +23,8 @@ import com.sitewhere.spi.device.IDeviceAssignment;
 import com.sitewhere.spi.device.IDeviceNestingContext;
 import com.sitewhere.spi.device.IDeviceType;
 import com.sitewhere.spi.device.command.IDeviceCommandExecution;
-import com.sitewhere.spi.tenant.ITenant;
+
+import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
 
 /**
  * Produces an encoded message based on Google Protocol Buffer derived from an
@@ -48,7 +49,7 @@ public class ProtobufMessageBuilder {
      * @throws SiteWhereException
      */
     public static byte[] createMessage(IDeviceCommandExecution execution, IDeviceNestingContext nested,
-	    List<IDeviceAssignment> assignments, ITenant tenant, IDeviceManagement deviceManagement)
+	    List<IDeviceAssignment> assignments, SiteWhereTenant tenant, IDeviceManagement deviceManagement)
 	    throws SiteWhereException {
 	IDeviceType deviceType = deviceManagement.getDeviceType(execution.getCommand().getDeviceTypeId());
 	DescriptorProtos.FileDescriptorProto fdproto = getFileDescriptor(deviceType, tenant, deviceManagement);
@@ -129,8 +130,8 @@ public class ProtobufMessageBuilder {
      * @return
      * @throws SiteWhereException
      */
-    protected static DescriptorProtos.FileDescriptorProto getFileDescriptor(IDeviceType deviceType, ITenant tenant,
-	    IDeviceManagement deviceManagement) throws SiteWhereException {
+    protected static DescriptorProtos.FileDescriptorProto getFileDescriptor(IDeviceType deviceType,
+	    SiteWhereTenant tenant, IDeviceManagement deviceManagement) throws SiteWhereException {
 	return ProtobufSpecificationBuilder.createFileDescriptor(deviceType, tenant, deviceManagement);
     }
 }

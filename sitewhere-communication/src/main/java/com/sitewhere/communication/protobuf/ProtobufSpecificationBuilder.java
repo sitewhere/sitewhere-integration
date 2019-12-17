@@ -20,7 +20,8 @@ import com.sitewhere.spi.device.command.ICommandParameter;
 import com.sitewhere.spi.device.command.IDeviceCommand;
 import com.sitewhere.spi.device.command.ParameterType;
 import com.sitewhere.spi.search.ISearchResults;
-import com.sitewhere.spi.tenant.ITenant;
+
+import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
 
 /**
  * Builds Google Protocol Buffer data structures that allow commands for a
@@ -39,8 +40,8 @@ public class ProtobufSpecificationBuilder {
      * @return
      * @throws SiteWhereException
      */
-    public static DescriptorProtos.FileDescriptorProto createFileDescriptor(IDeviceType deviceType, ITenant tenant,
-	    IDeviceManagement deviceManagement) throws SiteWhereException {
+    public static DescriptorProtos.FileDescriptorProto createFileDescriptor(IDeviceType deviceType,
+	    SiteWhereTenant tenant, IDeviceManagement deviceManagement) throws SiteWhereException {
 	DescriptorProtos.FileDescriptorProto.Builder builder = DescriptorProtos.FileDescriptorProto.newBuilder();
 	builder.addMessageType(createDeviceTypeMessage(deviceType, tenant, deviceManagement));
 	return builder.build();
@@ -55,8 +56,8 @@ public class ProtobufSpecificationBuilder {
      * @return
      * @throws SiteWhereException
      */
-    public static DescriptorProtos.DescriptorProto createDeviceTypeMessage(IDeviceType deviceType, ITenant tenant,
-	    IDeviceManagement deviceManagement) throws SiteWhereException {
+    public static DescriptorProtos.DescriptorProto createDeviceTypeMessage(IDeviceType deviceType,
+	    SiteWhereTenant tenant, IDeviceManagement deviceManagement) throws SiteWhereException {
 	DeviceCommandSearchCriteria criteria = new DeviceCommandSearchCriteria(1, 0);
 	criteria.setDeviceTypeToken(deviceType.getToken());
 	ISearchResults<IDeviceCommand> commands = deviceManagement.listDeviceCommands(criteria);

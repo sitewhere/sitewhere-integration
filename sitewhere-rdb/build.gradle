@@ -1,0 +1,79 @@
+description = 'SiteWhere RDB Implementation'
+
+dependencies {
+	// Confirm to Quarkus BOM.
+    compile enforcedPlatform('io.quarkus:quarkus-bom:1.0.1.Final')
+	    
+	// SiteWhere microservice library.
+    compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
+    
+    // Relational DB libraries.
+    compile ('org.hibernate:hibernate-core') {
+    	exclude group: 'org.jboss.spec.javax.transaction', module:'jboss-transaction-api_1.2_spec'
+    	exclude group: 'org.javassist', module:'javassist'
+    	exclude group: 'javax.xml.bind', module:'jaxb-api'
+    	exclude group: 'org.glassfish.jaxb', module:'jaxb-runtime'
+    	exclude group: 'javax.activation', module:'javax.activation-api'
+    }
+    compile group: 'org.flywaydb', name: 'flyway-core'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+// Publish jar.	
+apply plugin: 'maven-publish'
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+		    from components.java
+            artifact sourcesJar
+            artifact javadocJar
+			pom {
+			    name = 'SiteWhere RDB Integration'
+			    description = 'SiteWhere Relational Database Integration'
+			    url = 'http://sitewhere.io'
+			    licenses {
+			        license {
+			            name = 'CPAL-1.0'
+			            url = 'https://opensource.org/licenses/CPAL-1.0'
+			        }
+			    }
+                developers {
+                    developer {
+                        id = 'admin'
+                        name = 'SiteWhere Admin'
+                        email = 'admin@sitewhere.com'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/sitewhere/sitewhere-integration.git'
+                    url = 'https://github.com/sitewhere/sitewhere-integration'
+                }
+			}	
+		}
+	}
+    repositories {
+        maven {
+            url project.nexusUrl
+            credentials {
+                username project.nexusUsername
+                password project.nexusPassword
+            }
+        }
+    }
+}
+
+apply plugin: 'signing'
+signing {
+    sign publishing.publications.mavenJava
+}

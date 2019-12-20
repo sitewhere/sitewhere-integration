@@ -11,11 +11,31 @@ import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
 
+import com.sitewhere.spi.microservice.IFunctionIdentifier;
+
 public class FlywayConfig {
 
-    public Boolean tenantsFlyway(String tenantName, DataSource dataSource) {
-	Flyway flyway = Flyway.configure().locations("db/migrations/tenants").dataSource(dataSource).schemas(tenantName)
-		.load();
+    /**
+     * Convert a function identifier into a schema name.
+     * 
+     * @param function
+     * @return
+     */
+    public static String getSchemaName(IFunctionIdentifier function) {
+	return function.getPath().replaceAll("[-]", "");
+    }
+
+    /**
+     * Migrate tenant data if needed.
+     * 
+     * @param dataSource
+     * @param function
+     * @return
+     */
+    public static boolean migrateTenantData(DataSource dataSource, IFunctionIdentifier function) {
+	String area = getSchemaName(function);
+	Flyway flyway = Flyway.configure().locations(String.format("db/migrations/tenants/%s", area))
+		.dataSource(dataSource).schemas(area).load();
 	int migrate = flyway.migrate();
 	return (migrate > 0);
     }

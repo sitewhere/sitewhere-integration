@@ -13,13 +13,8 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.Environment;
-import org.hibernate.dialect.PostgreSQL94Dialect;
 import org.hibernate.jpa.HibernatePersistenceProvider;
-
-import com.sitewhere.rdb.multitenancy.DataSourceMultiTenantConnectionProviderImpl;
-import com.sitewhere.rdb.multitenancy.TenantIdentifierResolverImpl;
 
 /**
  * Provides information required to create a JPA persistence unit.
@@ -35,29 +30,38 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     /** Persistence unit name */
     private String persistenceUnitName = DEFAULT_UNIT_NAME;
 
+    /** Provider information */
+    private RdbProviderInformation provider;
+
+    /** List of class names being managed */
     private List<String> managedClassNames;
 
+    /** DataSource */
+    private DataSource jtaDataSource;
+
+    /** Schema referenced */
+    private String schema;
+
+    /** Hibernate properties */
     private Properties properties;
 
+    /** List of transformers */
     private List<ClassTransformer> transformers = new ArrayList<>();
 
-    /** Multitenant connection provider */
-    private DataSourceMultiTenantConnectionProviderImpl multitenant = new DataSourceMultiTenantConnectionProviderImpl();
-
-    /** Tenant identifier resolver */
-    private TenantIdentifierResolverImpl resolver = new TenantIdentifierResolverImpl();
-
-    public RdbPersistenceUnitInfo(List<String> managedClassNames) {
+    public RdbPersistenceUnitInfo(RdbProviderInformation provider, List<String> managedClassNames,
+	    DataSource dataSource, String schema) {
+	this.provider = provider;
 	this.managedClassNames = managedClassNames;
+	this.jtaDataSource = dataSource;
+	this.schema = schema;
 	this.properties = getHibernateProperties();
     }
 
     protected Properties getHibernateProperties() {
 	Properties props = new Properties();
-	props.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE);
-	props.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, multitenant);
-	props.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, resolver);
-	props.put(Environment.DIALECT, PostgreSQL94Dialect.class.getName());
+	props.put(Environment.DEFAULT_SCHEMA, schema);
+	props.put(Environment.HBM2DDL_AUTO, "validate");
+	props.put(Environment.DIALECT, provider.getDialect());
 	props.put(Environment.SHOW_SQL, String.valueOf(true));
 	props.put(Environment.FORMAT_SQL, String.valueOf(true));
 	props.put(Environment.NON_CONTEXTUAL_LOB_CREATION, String.valueOf(true));
@@ -94,7 +98,7 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
      */
     @Override
     public DataSource getJtaDataSource() {
-	return null;
+	return jtaDataSource;
     }
 
     /*

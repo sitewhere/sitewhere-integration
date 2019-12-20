@@ -8,16 +8,14 @@
 package com.sitewhere.rdb;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceUnitInfo;
+import javax.sql.DataSource;
 
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
 import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
-import org.reflections.Reflections;
 
 /**
  * Supports building an {@link EntityManagerFactory} which manages SiteWhere RDB
@@ -25,15 +23,16 @@ import org.reflections.Reflections;
  */
 public class RdbEntityManagerFactoryBuilder {
 
-    public static EntityManagerFactory build() {
-	Set<Class<?>> entityClasses = new Reflections("com.sitewhere.rdb.entities").getTypesAnnotatedWith(Entity.class);
-	PersistenceUnitInfo persistenceUnitInfo = getPersistenceUnitInfo(entityClasses);
+    public static EntityManagerFactory buildFrom(RdbProviderInformation provider, List<Class<?>> entityClasses,
+	    DataSource dataSource, String schema) {
+	PersistenceUnitInfo persistenceUnitInfo = getPersistenceUnitInfo(provider, entityClasses, dataSource, schema);
 	return new EntityManagerFactoryBuilderImpl(new PersistenceUnitInfoDescriptor(persistenceUnitInfo), null)
 		.build();
     }
 
-    protected static RdbPersistenceUnitInfo getPersistenceUnitInfo(Set<Class<?>> entityClasses) {
+    protected static RdbPersistenceUnitInfo getPersistenceUnitInfo(RdbProviderInformation provider,
+	    List<Class<?>> entityClasses, DataSource dataSource, String schema) {
 	List<String> classNames = entityClasses.stream().map(Class::getName).collect(Collectors.toList());
-	return new RdbPersistenceUnitInfo(classNames);
+	return new RdbPersistenceUnitInfo(provider, classNames, dataSource, schema);
     }
 }

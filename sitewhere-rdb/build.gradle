@@ -17,6 +17,7 @@ dependencies {
     }
     compile group: 'org.flywaydb', name: 'flyway-core'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 }
 

@@ -7,5 +7,30 @@
  */
 package com.sitewhere.rdb;
 
+import java.util.Optional;
+
 public interface CrudRepository<E, K> {
+
+    /**
+     * Find an entity by id.
+     * 
+     * @param key
+     * @return
+     */
+    Optional<E> findById(K key);
+
+    /**
+     * Persist entity in repository.
+     * 
+     * @param source
+     * @return
+     */
+    E save(E source);
+
+    /**
+     * Delete an entity by id.
+     * 
+     * @param key
+     */
+    void deleteById(K key);
 }

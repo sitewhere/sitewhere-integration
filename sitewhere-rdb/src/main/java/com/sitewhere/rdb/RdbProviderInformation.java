@@ -7,12 +7,13 @@
  */
 package com.sitewhere.rdb;
 
+import com.sitewhere.rdb.spi.IConnectionInformation;
 import com.sitewhere.rdb.spi.IDatabaseCreationProvider;
 
 /**
  * Holds information particular to a RDB persistence provider.
  */
-public class RdbProviderInformation {
+public abstract class RdbProviderInformation<T extends IConnectionInformation> {
 
     /** Provider name */
     private String name;
@@ -31,6 +32,32 @@ public class RdbProviderInformation {
 
     /** Classpath location of Flyway migration */
     private String flywayMigrationPath;
+
+    /** Connection information */
+    private T connectionInfo;
+
+    public RdbProviderInformation(T connectionInfo) {
+	this.connectionInfo = connectionInfo;
+    }
+
+    /**
+     * Build JDBC URL for connecting as DB creation user.
+     * 
+     * @return
+     */
+    public abstract String buildRootJdbcUrl();
+
+    /**
+     * Implemented in subclasses to build the JDBC URL.
+     * 
+     * @param dbname
+     * @return
+     */
+    public abstract String buildJdbcUrl(String dbname);
+
+    public T getConnectionInfo() {
+	return connectionInfo;
+    }
 
     public String getName() {
 	return name;

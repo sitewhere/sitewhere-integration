@@ -23,12 +23,14 @@ import com.sitewhere.spi.SiteWhereException;
 /**
  * Provider compatible with PostgreSQL 9.5.
  */
-public class Postgres95Provider extends RdbProviderInformation {
+public class Postgres95Provider extends RdbProviderInformation<PostgresConnectionInfo> {
 
     /** Static logger instance */
     private static Logger LOGGER = LoggerFactory.getLogger(Postgres95Provider.class);
 
-    public Postgres95Provider() {
+    public Postgres95Provider(PostgresConnectionInfo connectionInfo) {
+	super(connectionInfo);
+
 	setName("postgres");
 	setDescription("PostgreSQL");
 	setDialect(PostgreSQL95Dialect.class.getName());
@@ -68,5 +70,23 @@ public class Postgres95Provider extends RdbProviderInformation {
 	});
 	setDatabaseNameTemplate("tenant_%s");
 	setFlywayMigrationPath("db/postgres/migrations/tenant");
+    }
+
+    /*
+     * @see com.sitewhere.rdb.RdbProviderInformation#buildRootJdbcUrl()
+     */
+    @Override
+    public String buildRootJdbcUrl() {
+	return String.format("jdbc:postgresql://%s:%d/?", getConnectionInfo().getHostname(),
+		getConnectionInfo().getPort());
+    }
+
+    /*
+     * @see com.sitewhere.rdb.RdbProviderInformation#buildJdbcUrl(java.lang.String)
+     */
+    @Override
+    public String buildJdbcUrl(String dbname) {
+	return String.format("jdbc:postgresql://%s:%d/%s", getConnectionInfo().getHostname(),
+		getConnectionInfo().getPort(), dbname);
     }
 }

@@ -38,7 +38,7 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     private String persistenceUnitName = DEFAULT_UNIT_NAME;
 
     /** Provider information */
-    private RdbProviderInformation provider;
+    private RdbProviderInformation<?> provider;
 
     /** List of class names being managed */
     private List<String> managedClassNames;
@@ -55,7 +55,7 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     /** List of transformers */
     private List<ClassTransformer> transformers = new ArrayList<>();
 
-    public RdbPersistenceUnitInfo(RdbProviderInformation provider, List<String> managedClassNames,
+    public RdbPersistenceUnitInfo(RdbProviderInformation<?> provider, List<String> managedClassNames,
 	    DataSource dataSource, String schema) {
 	this.provider = provider;
 	this.managedClassNames = managedClassNames;

@@ -9,14 +9,7 @@ package com.sitewhere.rdb.spi;
 
 import javax.persistence.EntityManager;
 
-public interface IRdbTenantComponent<T extends IRdbClient> {
-
-    /**
-     * Get RDB client associated with component.
-     * 
-     * @return
-     */
-    T getClient();
+public interface IRdbTenantComponent {
 
     /**
      * Get provider that exposes {@link EntityManager} used for database operations.

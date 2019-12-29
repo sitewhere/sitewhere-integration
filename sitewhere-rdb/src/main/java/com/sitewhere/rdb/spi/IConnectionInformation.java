@@ -7,6 +7,22 @@
  */
 package com.sitewhere.rdb.spi;
 
-public interface IRdbClient {
+/**
+ * Provides information used to connect to a database.
+ */
+public interface IConnectionInformation {
 
+    /**
+     * Get database username.
+     * 
+     * @return
+     */
+    String getUsername();
+
+    /**
+     * Get database password.
+     * 
+     * @return
+     */
+    String getPassword();
 }

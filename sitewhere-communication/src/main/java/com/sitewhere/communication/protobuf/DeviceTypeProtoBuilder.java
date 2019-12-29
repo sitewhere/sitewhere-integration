@@ -42,7 +42,7 @@ public class DeviceTypeProtoBuilder {
 
 	DeviceCommandSearchCriteria criteria = new DeviceCommandSearchCriteria(1, 0);
 	criteria.setDeviceTypeToken(deviceType.getToken());
-	ISearchResults<IDeviceCommand> commands = deviceManagement.listDeviceCommands(criteria);
+	ISearchResults<? extends IDeviceCommand> commands = deviceManagement.listDeviceCommands(criteria);
 
 	generateProto(deviceType, commands.getResults(), buffer);
 	return buffer.toString();
@@ -56,8 +56,8 @@ public class DeviceTypeProtoBuilder {
      * @param buffer
      * @throws SiteWhereException
      */
-    protected static void generateProto(IDeviceType deviceType, List<IDeviceCommand> commands, StringBuffer buffer)
-	    throws SiteWhereException {
+    protected static void generateProto(IDeviceType deviceType, List<? extends IDeviceCommand> commands,
+	    StringBuffer buffer) throws SiteWhereException {
 	int indent = 0;
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z");
 	String typeName = ProtobufNaming.getDeviceTypeIdentifier(deviceType);
@@ -88,8 +88,8 @@ public class DeviceTypeProtoBuilder {
      * @param buffer
      * @throws SiteWhereException
      */
-    protected static void addCommandsEnum(IDeviceType deviceType, List<IDeviceCommand> commands, StringBuffer buffer,
-	    int indent) throws SiteWhereException {
+    protected static void addCommandsEnum(IDeviceType deviceType, List<? extends IDeviceCommand> commands,
+	    StringBuffer buffer, int indent) throws SiteWhereException {
 	StringBuffer enumCmds = new StringBuffer();
 	enumCmds.append("enum " + ProtobufNaming.COMMAND_TYPES_ENUM + " {");
 	int index = 1;

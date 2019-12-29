@@ -60,7 +60,7 @@ public class ProtobufSpecificationBuilder {
 	    SiteWhereTenant tenant, IDeviceManagement deviceManagement) throws SiteWhereException {
 	DeviceCommandSearchCriteria criteria = new DeviceCommandSearchCriteria(1, 0);
 	criteria.setDeviceTypeToken(deviceType.getToken());
-	ISearchResults<IDeviceCommand> commands = deviceManagement.listDeviceCommands(criteria);
+	ISearchResults<? extends IDeviceCommand> commands = deviceManagement.listDeviceCommands(criteria);
 
 	DescriptorProtos.DescriptorProto.Builder builder = DescriptorProtos.DescriptorProto.newBuilder();
 	builder.setName(ProtobufNaming.getDeviceTypeIdentifier(deviceType));
@@ -82,7 +82,7 @@ public class ProtobufSpecificationBuilder {
      * @return
      * @throws SiteWhereException
      */
-    public static DescriptorProtos.EnumDescriptorProto createCommandsEnum(List<IDeviceCommand> commands)
+    public static DescriptorProtos.EnumDescriptorProto createCommandsEnum(List<? extends IDeviceCommand> commands)
 	    throws SiteWhereException {
 	DescriptorProtos.EnumDescriptorProto.Builder builder = DescriptorProtos.EnumDescriptorProto.newBuilder();
 	builder.setName(ProtobufNaming.COMMAND_TYPES_ENUM);

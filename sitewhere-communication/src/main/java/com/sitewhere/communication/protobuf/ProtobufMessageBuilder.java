@@ -49,7 +49,7 @@ public class ProtobufMessageBuilder {
      * @throws SiteWhereException
      */
     public static byte[] createMessage(IDeviceCommandExecution execution, IDeviceNestingContext nested,
-	    List<IDeviceAssignment> assignments, SiteWhereTenant tenant, IDeviceManagement deviceManagement)
+	    List<? extends IDeviceAssignment> assignments, SiteWhereTenant tenant, IDeviceManagement deviceManagement)
 	    throws SiteWhereException {
 	IDeviceType deviceType = deviceManagement.getDeviceType(execution.getCommand().getDeviceTypeId());
 	DescriptorProtos.FileDescriptorProto fdproto = getFileDescriptor(deviceType, tenant, deviceManagement);

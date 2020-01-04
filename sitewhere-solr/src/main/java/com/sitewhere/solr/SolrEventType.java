@@ -9,8 +9,6 @@ package com.sitewhere.solr;
 
 /**
  * Enumerates event types that can be stored in Solr.
- * 
- * @author Derek
  */
 public enum SolrEventType {
 

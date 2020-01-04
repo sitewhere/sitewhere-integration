@@ -13,8 +13,6 @@ import com.sitewhere.spi.common.IMetadataProvider;
 
 /**
  * Used to load or save device entity metdata to MongoDB.
- * 
- * @author dadams
  */
 public class MongoMetadataProvider {
 

@@ -9,9 +9,6 @@ package com.sitewhere.mongodb;
 
 /**
  * Looks up a {@link MongoConverter}
- * 
- * @author Derek
- *
  */
 public interface IMongoConverterLookup {
 

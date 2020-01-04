@@ -11,8 +11,6 @@ import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponent;
 
 /**
  * Allows MQTT settings to be configured consistently across components.
- * 
- * @author Derek
  */
 public interface IMqttComponent extends ILifecycleComponent {
 

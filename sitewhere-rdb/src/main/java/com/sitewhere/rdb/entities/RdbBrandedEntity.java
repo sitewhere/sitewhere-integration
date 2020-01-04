@@ -92,7 +92,7 @@ public abstract class RdbBrandedEntity extends RdbPersistentEntity implements IB
 	    target.setBorderColor(source.getBorderColor());
 	}
 	if (source.getImageUrl() != null) {
-	    target.setIcon(source.getImageUrl());
+	    target.setImageUrl(source.getImageUrl());
 	}
 	if (source.getIcon() != null) {
 	    target.setIcon(source.getIcon());

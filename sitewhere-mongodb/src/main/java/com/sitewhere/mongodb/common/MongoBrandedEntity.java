@@ -14,8 +14,6 @@ import com.sitewhere.spi.common.IBrandedEntity;
 
 /**
  * Used to load or save {@link BrandedEntity} data to MongoDB.
- * 
- * @author dadams
  */
 public class MongoBrandedEntity {
 

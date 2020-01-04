@@ -67,15 +67,20 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
     /** Provider */
     private RdbProviderInformation<?> provider;
 
+    /** Persistence options */
+    private RdbPersistenceOptions persistenceOptions;
+
     /** Allows blocking until database is available */
     private CountDownLatch databaseAvailable = new CountDownLatch(1);
 
     /** Thread for database connection waiter */
     private Executor executor = Executors.newSingleThreadExecutor();
 
-    public RdbEntityManagerProvider(RdbProviderInformation<?> provider, Class<?>[] entityClasses) {
+    public RdbEntityManagerProvider(RdbProviderInformation<?> provider, RdbPersistenceOptions persistenceOptions,
+	    Class<?>[] entityClasses) {
 	super(LifecycleComponentType.DataStore);
 	this.provider = provider;
+	this.persistenceOptions = persistenceOptions;
 	this.entityClasses = entityClasses;
     }
 
@@ -112,8 +117,8 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 
 	// Create a new factory and entity manager.
 	List<Class<?>> entityClasses = Arrays.asList(getEntityClasses());
-	this.entityManagerFactory = RdbEntityManagerFactoryBuilder.buildFrom(provider, entityClasses, getDataSource(),
-		schema);
+	this.entityManagerFactory = RdbEntityManagerFactoryBuilder.buildFrom(provider, persistenceOptions,
+		entityClasses, getDataSource(), schema);
 	this.entityManager = getEntityManagerFactory().createEntityManager();
     }
 
@@ -195,6 +200,7 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	    tx.commit();
 	} catch (Exception e) {
 	    tx.rollback();
+	    getLogger().error("Entity persist failed.", e);
 	    throw new SiteWhereException("Entity persist failed.", e);
 	}
     }
@@ -212,7 +218,8 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	    return result;
 	} catch (Exception e) {
 	    tx.rollback();
-	    throw new SiteWhereException("Entity persist failed.", e);
+	    getLogger().error("Entity merge failed.", e);
+	    throw new SiteWhereException("Entity merge failed.", e);
 	}
     }
 

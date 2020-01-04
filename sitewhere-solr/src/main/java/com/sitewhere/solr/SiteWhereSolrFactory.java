@@ -30,8 +30,6 @@ import com.sitewhere.spi.device.event.IDeviceMeasurement;
 
 /**
  * Factory that creates indexable Solr objects from SiteWhere objects.
- * 
- * @author Derek
  */
 public class SiteWhereSolrFactory {
 

@@ -9,8 +9,6 @@ package com.sitewhere.solr;
 
 /**
  * Contains constants for Solr field names.
- * 
- * @author Derek
  */
 public interface ISolrFields {
 
@@ -37,10 +35,10 @@ public interface ISolrFields {
 
     /** Event received date */
     public static final String RECEIVED_DATE = "receivedDate";
-    
+
     /** Measurement name */
     public static final String MX_NAME = "mxName";
-    
+
     /** Measurement value */
     public static final String MX_VALUE = "mxValue";
 

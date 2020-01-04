@@ -40,6 +40,9 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     /** Provider information */
     private RdbProviderInformation<?> provider;
 
+    /** Persistence options */
+    private RdbPersistenceOptions options;
+
     /** List of class names being managed */
     private List<String> managedClassNames;
 
@@ -55,9 +58,10 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     /** List of transformers */
     private List<ClassTransformer> transformers = new ArrayList<>();
 
-    public RdbPersistenceUnitInfo(RdbProviderInformation<?> provider, List<String> managedClassNames,
-	    DataSource dataSource, String schema) {
+    public RdbPersistenceUnitInfo(RdbProviderInformation<?> provider, RdbPersistenceOptions options,
+	    List<String> managedClassNames, DataSource dataSource, String schema) {
 	this.provider = provider;
+	this.options = options;
 	this.managedClassNames = managedClassNames;
 	this.jtaDataSource = dataSource;
 	this.schema = schema;
@@ -67,10 +71,10 @@ public class RdbPersistenceUnitInfo implements PersistenceUnitInfo {
     protected Properties getHibernateProperties() {
 	Properties props = new Properties();
 	props.put(Environment.DEFAULT_SCHEMA, schema);
-	props.put(Environment.HBM2DDL_AUTO, "validate");
+	props.put(Environment.HBM2DDL_AUTO, options.getHbmToDdlAuto());
 	props.put(Environment.DIALECT, provider.getDialect());
-	props.put(Environment.SHOW_SQL, String.valueOf(true));
-	props.put(Environment.FORMAT_SQL, String.valueOf(true));
+	props.put(Environment.SHOW_SQL, String.valueOf(options.isShowSql()));
+	props.put(Environment.FORMAT_SQL, String.valueOf(options.isFormatSql()));
 	props.put(Environment.NON_CONTEXTUAL_LOB_CREATION, String.valueOf(true));
 	return props;
     }

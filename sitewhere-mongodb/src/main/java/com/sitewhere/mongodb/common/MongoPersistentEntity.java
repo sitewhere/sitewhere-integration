@@ -17,8 +17,6 @@ import com.sitewhere.spi.common.IPersistentEntity;
 
 /**
  * Used to load or save {@link PersistentEntity} data to MongoDB.
- * 
- * @author dadams
  */
 public class MongoPersistentEntity {
 

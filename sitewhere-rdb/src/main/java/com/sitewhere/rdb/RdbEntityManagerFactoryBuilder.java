@@ -23,16 +23,17 @@ import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
  */
 public class RdbEntityManagerFactoryBuilder {
 
-    public static EntityManagerFactory buildFrom(RdbProviderInformation<?> provider, List<Class<?>> entityClasses,
-	    DataSource dataSource, String schema) {
-	PersistenceUnitInfo persistenceUnitInfo = getPersistenceUnitInfo(provider, entityClasses, dataSource, schema);
+    public static EntityManagerFactory buildFrom(RdbProviderInformation<?> provider, RdbPersistenceOptions options,
+	    List<Class<?>> entityClasses, DataSource dataSource, String schema) {
+	PersistenceUnitInfo persistenceUnitInfo = getPersistenceUnitInfo(provider, options, entityClasses, dataSource,
+		schema);
 	return new EntityManagerFactoryBuilderImpl(new PersistenceUnitInfoDescriptor(persistenceUnitInfo), null)
 		.build();
     }
 
     protected static RdbPersistenceUnitInfo getPersistenceUnitInfo(RdbProviderInformation<?> provider,
-	    List<Class<?>> entityClasses, DataSource dataSource, String schema) {
+	    RdbPersistenceOptions options, List<Class<?>> entityClasses, DataSource dataSource, String schema) {
 	List<String> classNames = entityClasses.stream().map(Class::getName).collect(Collectors.toList());
-	return new RdbPersistenceUnitInfo(provider, classNames, dataSource, schema);
+	return new RdbPersistenceUnitInfo(provider, options, classNames, dataSource, schema);
     }
 }

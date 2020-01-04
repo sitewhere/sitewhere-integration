@@ -40,7 +40,8 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
      */
     @Override
     public void tenantInitialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
-	this.rdbEntityManagerProvider = new RdbEntityManagerProvider(getProviderInformation(), getEntityClasses());
+	this.rdbEntityManagerProvider = new RdbEntityManagerProvider(getProviderInformation(), getPersistenceOptions(),
+		getEntityClasses());
 
 	// Create step that will initialize components.
 	ICompositeLifecycleStep init = new CompositeLifecycleStep("Initialize RDB " + getComponentName());
@@ -92,5 +93,13 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
     @Override
     public IRdbEntityManagerProvider getRdbEntityManagerProvider() {
 	return rdbEntityManagerProvider;
+    }
+
+    /*
+     * @see com.sitewhere.rdb.spi.IRdbTenantEngine#getPersistenceOptions()
+     */
+    @Override
+    public RdbPersistenceOptions getPersistenceOptions() {
+	return new RdbPersistenceOptions();
     }
 }

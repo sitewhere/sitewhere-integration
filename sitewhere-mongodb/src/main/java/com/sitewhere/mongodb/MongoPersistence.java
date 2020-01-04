@@ -33,8 +33,6 @@ import com.sitewhere.spi.search.ISearchCriteria;
 
 /**
  * Common handlers for persisting Mongo data.
- * 
- * @author Derek
  */
 public class MongoPersistence {
 

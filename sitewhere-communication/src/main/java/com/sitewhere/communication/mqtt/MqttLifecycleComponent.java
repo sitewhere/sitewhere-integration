@@ -33,8 +33,6 @@ import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
 /**
  * Extends {@link TenantEngineLifecycleComponent} with base functionality for
  * connecting to MQTT.
- * 
- * @author Derek
  */
 public class MqttLifecycleComponent extends TenantEngineLifecycleComponent implements IMqttComponent {
 

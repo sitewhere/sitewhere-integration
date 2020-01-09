@@ -55,8 +55,8 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
     /** JPA entity manager factory */
     private EntityManagerFactory entityManagerFactory;
 
-    /** Entity manager */
-    private EntityManager entityManager;
+    /** Entity managers by thread */
+    private ThreadLocal<EntityManager> entityManagers = new ThreadLocal<EntityManager>();
 
     /** Managed entity classes */
     private Class<?>[] entityClasses;
@@ -119,7 +119,19 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	List<Class<?>> entityClasses = Arrays.asList(getEntityClasses());
 	this.entityManagerFactory = RdbEntityManagerFactoryBuilder.buildFrom(provider, persistenceOptions,
 		entityClasses, getDataSource(), schema);
-	this.entityManager = getEntityManagerFactory().createEntityManager();
+    }
+
+    /*
+     * @see com.sitewhere.rdb.spi.IRdbEntityManagerProvider#getEntityManager()
+     */
+    @Override
+    public EntityManager getEntityManager() {
+	EntityManager em = getEntityManagers().get();
+	if (em == null) {
+	    em = getEntityManagerFactory().createEntityManager();
+	    getEntityManagers().set(em);
+	}
+	return em;
     }
 
     protected String getDatabaseName() {
@@ -176,9 +188,6 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
      * Shut down entity manager and factory if already created.
      */
     protected void shutDownIfAlreadyCreated() {
-	if (getEntityManager() != null) {
-	    getEntityManager().close();
-	}
 	if (getEntityManagerFactory() != null) {
 	    getEntityManagerFactory().close();
 	}
@@ -356,19 +365,15 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
     }
 
     /*
-     * @see com.sitewhere.rdb.spi.IRdbEntityManagerProvider#getEntityManager()
-     */
-    @Override
-    public EntityManager getEntityManager() {
-	return entityManager;
-    }
-
-    /*
      * @see com.sitewhere.rdb.spi.IRdbEntityManagerProvider#getEntityClasses()
      */
     @Override
     public Class<?>[] getEntityClasses() {
 	return entityClasses;
+    }
+
+    protected ThreadLocal<EntityManager> getEntityManagers() {
+	return entityManagers;
     }
 
     protected CountDownLatch getDatabaseAvailable() {

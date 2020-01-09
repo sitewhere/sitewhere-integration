@@ -15,8 +15,8 @@ public class Warp10Configuration {
     /** Default token.secret */
     private static final String DEFAULT_TOKEN_SECRET = "sitewhere";
 
-    /** Host */
-    private String hostname;
+    /** Base URL */
+    private String baseUrl;
 
     /** Token secret */
     private String tokenSecret = DEFAULT_TOKEN_SECRET;
@@ -24,12 +24,12 @@ public class Warp10Configuration {
     /** Application */
     private String application;
 
-    public String getHostname() {
-	return hostname;
+    public String getBaseUrl() {
+	return baseUrl;
     }
 
-    public void setHostname(String hostname) {
-	this.hostname = hostname;
+    public void setBaseUrl(String baseUrl) {
+	this.baseUrl = baseUrl;
     }
 
     public String getTokenSecret() {

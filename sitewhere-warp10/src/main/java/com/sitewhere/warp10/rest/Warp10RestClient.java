@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.sitewhere.spi.SiteWhereException;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -22,20 +24,19 @@ import okhttp3.Response;
 
 public class Warp10RestClient {
 
+    /** HTTP client */
     private OkHttpClient client = new OkHttpClient();
 
+    /** Base URL for request */
     private String url;
-
-    @SuppressWarnings("unused")
-    private int port;
-
-    private Warp10Token readToken;
-
-    private Warp10Token writeToken;
 
     private String tokenSecret;
 
     private String application;
+
+    private Warp10Token readToken;
+
+    private Warp10Token writeToken;
 
     private static final String X_WARP_10_TOKEN = "X-Warp10-Token";
 
@@ -62,7 +63,7 @@ public class Warp10RestClient {
 	}
     }
 
-    public int ingress(GTSInput data) {
+    public int ingress(GTSInput data) throws SiteWhereException {
 	if (writeToken == null) {
 	    writeToken = getToken(TokenType.WRITE);
 	}
@@ -82,24 +83,22 @@ public class Warp10RestClient {
 	    }
 	    return responseCode;
 	} catch (IOException e) {
-	    e.printStackTrace();
-	} catch (Exception e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Error sending Warp 10 request.", e);
+	} catch (Throwable e) {
+	    throw new SiteWhereException("Unhandled exception sending Warp 10 request.", e);
 	} finally {
 	    if (response != null) {
 		response.body().close();
 	    }
 	}
-	return 500;
     }
 
-    public List<GTSOutput> fetch(QueryParams queryParams) {
+    public List<GTSOutput> fetch(QueryParams queryParams) throws SiteWhereException {
 	if (readToken == null) {
 	    readToken = getToken(TokenType.READ);
 	}
 
 	Response response = null;
-
 	try {
 	    Request request = new Request.Builder().url(url + "/fetch?" + queryParams.toString())
 		    .header(X_WARP_10_TOKEN, readToken.getToken()).get().build();
@@ -113,19 +112,17 @@ public class Warp10RestClient {
 	    }
 	    return gtsOutputs;
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Error executing Warp 10 fetch.", e);
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Unhandled exception executing Warp 10 fetch.", e);
 	} finally {
 	    if (response != null) {
 		response.body().close();
 	    }
 	}
-	return null;
     }
 
-    public int delete(String query) {
-
+    public int delete(String query) throws SiteWhereException {
 	if (writeToken == null) {
 	    writeToken = getToken(TokenType.WRITE);
 	}
@@ -144,18 +141,18 @@ public class Warp10RestClient {
 	    }
 	    return responseCode;
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Error executing Warp 10 delete.", e);
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Unhandled exception executing Warp 10 delete.", e);
 	} finally {
 	    if (response != null) {
 		response.body().close();
 	    }
 	}
-	return 564;
     }
 
-    private Warp10Token getToken(TokenType tokenType) {
+    private Warp10Token getToken(TokenType tokenType) throws SiteWhereException {
+	String responseContent = null;
 	try {
 	    TokenRequest tokenRequest = createTokenRequest(tokenType);
 	    MediaType textPlainMT = MediaType.parse("application/octet-stream");
@@ -164,14 +161,16 @@ public class Warp10RestClient {
 
 	    Response response = client.newCall(request).execute();
 	    Gson gson = new Gson();
-	    Warp10Token[] warp10Tokens = gson.fromJson(response.peekBody(Long.MAX_VALUE).string(), Warp10Token[].class);
+	    responseContent = response.peekBody(Long.MAX_VALUE).string();
+	    Warp10Token[] warp10Tokens = gson.fromJson(responseContent, Warp10Token[].class);
 	    return warp10Tokens[0];
+	} catch (JsonSyntaxException e) {
+	    throw new SiteWhereException(String.format("Invalid Warp 10 token respnse. %s", responseContent), e);
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Error getting Warp 10 token.", e);
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    throw new SiteWhereException("Unhandled exception getting Warp 10 token.", e);
 	}
-	return null;
     }
 
     private TokenRequest createTokenRequest(TokenType tokenType) {
@@ -195,10 +194,6 @@ public class Warp10RestClient {
 
     public void setUrl(String url) {
 	this.url = url;
-    }
-
-    public void setPort(int port) {
-	this.port = port;
     }
 
     public void setReadToken(Warp10Token readToken) {

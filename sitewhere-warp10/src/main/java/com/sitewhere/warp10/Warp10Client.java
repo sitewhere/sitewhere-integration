@@ -12,7 +12,6 @@ import java.util.List;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 import com.sitewhere.warp10.rest.GTSInput;
@@ -23,20 +22,20 @@ import com.sitewhere.warp10.rest.Warp10RestClient;
 /**
  * Client used for connecting to and interacting with an Warp 10 server.
  */
-public class Warp10DbClient extends TenantEngineLifecycleComponent implements IDiscoverableTenantLifecycleComponent {
+public class Warp10Client extends TenantEngineLifecycleComponent {
 
     /** Warp10 configuration parameters */
     private Warp10Configuration configuration;
 
     /** Hostname parameter */
-    private ILifecycleComponentParameter<String> hostname;
+    private ILifecycleComponentParameter<String> baseUrl;
 
     /** Port parameter */
     private ILifecycleComponentParameter<String> tokenSecret;
 
     private Warp10RestClient warp10RestClient;
 
-    public Warp10DbClient(Warp10Configuration configuration) {
+    public Warp10Client(Warp10Configuration configuration) {
 	this.configuration = configuration;
     }
 
@@ -47,10 +46,10 @@ public class Warp10DbClient extends TenantEngineLifecycleComponent implements ID
      */
     @Override
     public void initializeParameters() throws SiteWhereException {
-	// Add hostname.
-	this.hostname = StringComponentParameter.newBuilder(this, "Hostname").value(getConfiguration().getHostname())
+	// Add base URL.
+	this.baseUrl = StringComponentParameter.newBuilder(this, "Base URL").value(getConfiguration().getBaseUrl())
 		.makeRequired().build();
-	getParameters().add(hostname);
+	getParameters().add(baseUrl);
 
 	// Add token secret.
 	this.tokenSecret = StringComponentParameter.newBuilder(this, "Token secret")
@@ -64,29 +63,20 @@ public class Warp10DbClient extends TenantEngineLifecycleComponent implements ID
      */
     @Override
     public void initialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
-	super.start(monitor);
-	this.warp10RestClient = Warp10RestClient.newBuilder().withConnectionTo(configuration.getHostname(),
-		configuration.getTokenSecret(), getTenantEngine().getName()).build();
+	super.initialize(monitor);
+	this.warp10RestClient = Warp10RestClient.newBuilder().withConnectionTo(getConfiguration().getBaseUrl(),
+		getConfiguration().getTokenSecret(), getTenantEngine().getName()).build();
     }
 
-    public int insertGTS(GTSInput gtsInput) {
+    public int insertGTS(GTSInput gtsInput) throws SiteWhereException {
 	return warp10RestClient.ingress(gtsInput);
     }
 
-    public List<GTSOutput> findGTS(QueryParams queryParams) {
+    public List<GTSOutput> findGTS(QueryParams queryParams) throws SiteWhereException {
 	return warp10RestClient.fetch(queryParams);
-    }
-
-    @Override
-    public boolean isRequired() {
-	return false;
     }
 
     public Warp10Configuration getConfiguration() {
 	return configuration;
-    }
-
-    public void setConfiguration(Warp10Configuration configuration) {
-	this.configuration = configuration;
     }
 }

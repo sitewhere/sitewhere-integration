@@ -16,14 +16,13 @@ import org.influxdb.InfluxDBFactory;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 
 /**
  * Client used for connecting to and interacting with an InfluxDB server.
  */
-public class InfluxDbClient extends TenantEngineLifecycleComponent implements IDiscoverableTenantLifecycleComponent {
+public class InfluxDbClient extends TenantEngineLifecycleComponent {
 
     /** InfluxDB configuration parameters */
     private InfluxConfiguration configuration;
@@ -94,18 +93,6 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent implements ID
 	    return LogLevel.FULL;
 	}
 	return LogLevel.NONE;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.sitewhere.spi.server.lifecycle.IDiscoverableTenantLifecycleComponent#
-     * isRequired()
-     */
-    @Override
-    public boolean isRequired() {
-	return true;
     }
 
     public InfluxConfiguration getConfiguration() {

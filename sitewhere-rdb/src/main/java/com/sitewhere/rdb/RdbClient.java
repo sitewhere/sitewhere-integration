@@ -8,15 +8,12 @@
 package com.sitewhere.rdb;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
-import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
-import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
 
 /**
  * Client used to connect to relational databases.
  */
-public class RdbClient extends TenantEngineLifecycleComponent implements IDiscoverableTenantLifecycleComponent {
+public class RdbClient extends TenantEngineLifecycleComponent {
 
     /** Relational database configuration */
     @SuppressWarnings("unused")
@@ -29,17 +26,5 @@ public class RdbClient extends TenantEngineLifecycleComponent implements IDiscov
     public RdbClient(RDBConfiguration configuration) {
 	super(LifecycleComponentType.DataStore);
 	this.configuration = configuration;
-    }
-
-    @Override
-    public boolean isRequired() {
-	return true;
-    }
-
-    @Override
-    public void start(ILifecycleProgressMonitor monitor) throws SiteWhereException {
-	// String tenantId = this.getTenantEngine().getTenant().getId().toString();
-	// Add a new datasource.
-	// MultiTenantContext.setTenantId(tenantId);
     }
 }

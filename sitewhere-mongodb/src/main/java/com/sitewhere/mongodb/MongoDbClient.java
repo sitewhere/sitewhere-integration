@@ -25,7 +25,6 @@ import com.mongodb.event.CommandSucceededEvent;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
@@ -33,8 +32,7 @@ import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
 /**
  * Client used for connecting to and interacting with an MongoDB server.
  */
-public abstract class MongoDbClient extends TenantEngineLifecycleComponent
-	implements IDiscoverableTenantLifecycleComponent, CommandListener {
+public abstract class MongoDbClient extends TenantEngineLifecycleComponent implements CommandListener {
 
     /** MongoDB client */
     private MongoClient client;
@@ -51,18 +49,6 @@ public abstract class MongoDbClient extends TenantEngineLifecycleComponent
     public MongoDbClient(MongoConfiguration configuration) {
 	super(LifecycleComponentType.DataStore);
 	this.configuration = configuration;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.sitewhere.spi.server.lifecycle.IDiscoverableTenantLifecycleComponent#
-     * isRequired()
-     */
-    @Override
-    public boolean isRequired() {
-	return true;
     }
 
     /*

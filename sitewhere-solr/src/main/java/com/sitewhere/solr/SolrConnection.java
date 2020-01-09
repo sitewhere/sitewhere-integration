@@ -12,14 +12,13 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
 
 /**
  * Creates client connection to an Apache Solr instance.
  */
-public class SolrConnection extends TenantEngineLifecycleComponent implements IDiscoverableTenantLifecycleComponent {
+public class SolrConnection extends TenantEngineLifecycleComponent {
 
     /** Solr configuration */
     private SolrConfiguration solrConfiguration;
@@ -30,18 +29,6 @@ public class SolrConnection extends TenantEngineLifecycleComponent implements ID
     public SolrConnection(SolrConfiguration solrConfiguration) {
 	super(LifecycleComponentType.Other);
 	this.solrConfiguration = solrConfiguration;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.sitewhere.spi.server.lifecycle.IDiscoverableTenantLifecycleComponent#
-     * isRequired()
-     */
-    @Override
-    public boolean isRequired() {
-	return true;
     }
 
     /*

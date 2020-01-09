@@ -15,7 +15,6 @@ import com.datastax.driver.core.exceptions.QueryExecutionException;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.IDiscoverableTenantLifecycleComponent;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 
@@ -23,7 +22,7 @@ import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
  * Client used for connecting to and interacting with an Apache Cassandra
  * cluster.
  */
-public class CassandraClient extends TenantEngineLifecycleComponent implements IDiscoverableTenantLifecycleComponent {
+public class CassandraClient extends TenantEngineLifecycleComponent {
 
     /** Cassandra configuration */
     private CassandraConfiguration configuration;
@@ -113,16 +112,6 @@ public class CassandraClient extends TenantEngineLifecycleComponent implements I
      */
     public int getBucketValue(long dateInMs) {
 	return (int) (dateInMs / getBucketLengthInMs());
-    }
-
-    /*
-     * @see
-     * com.sitewhere.spi.server.lifecycle.IDiscoverableTenantLifecycleComponent#
-     * isRequired()
-     */
-    @Override
-    public boolean isRequired() {
-	return true;
     }
 
     public CassandraConfiguration getConfiguration() {

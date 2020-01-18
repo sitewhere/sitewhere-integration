@@ -23,7 +23,6 @@ import org.fusesource.hawtdispatch.DispatchQueue;
 import org.fusesource.mqtt.client.Future;
 import org.fusesource.mqtt.client.FutureConnection;
 import org.fusesource.mqtt.client.MQTT;
-import org.fusesource.mqtt.client.QoS;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.spi.SiteWhereException;
@@ -34,54 +33,13 @@ import com.sitewhere.spi.microservice.lifecycle.LifecycleComponentType;
  * Extends {@link TenantEngineLifecycleComponent} with base functionality for
  * connecting to MQTT.
  */
-public class MqttLifecycleComponent extends TenantEngineLifecycleComponent implements IMqttComponent {
-
-    /** Default protocol if not set via Spring */
-    public static final String DEFAULT_PROTOCOL = "tcp";
-
-    /** Default hostname if not set via Spring */
-    public static final String DEFAULT_HOSTNAME = "localhost";
-
-    /** Default port if not set from Spring */
-    public static final String DEFAULT_PORT = "1883";
+public class MqttLifecycleComponent extends TenantEngineLifecycleComponent {
 
     /** Default connection timeout in seconds */
     public static final long DEFAULT_CONNECT_TIMEOUT_SECS = 5;
 
-    private String protocol = DEFAULT_PROTOCOL;
-
-    /** Host name */
-    private String hostname = DEFAULT_HOSTNAME;
-
-    /** Port */
-    private String port = DEFAULT_PORT;
-
-    /** TrustStore path */
-    private String trustStorePath;
-
-    /** TrustStore password */
-    private String trustStorePassword;
-
-    /** KeyStore path */
-    private String keyStorePath;
-
-    /** KeyStore password */
-    private String keyStorePassword;
-
-    /** Username */
-    private String username;
-
-    /** Password */
-    private String password;
-
-    /** Client id */
-    private String clientId;
-
-    /** Clean session flag */
-    private boolean cleanSession = true;
-
-    /** Quality of service */
-    private String qos = QoS.AT_LEAST_ONCE.name();
+    /** Configuration parameters */
+    private IMqttConfiguration configuration;
 
     /** MQTT client */
     private MQTT mqtt;
@@ -89,8 +47,9 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
     /** Hawtdispatch queue */
     private DispatchQueue queue;
 
-    public MqttLifecycleComponent(LifecycleComponentType type) {
+    public MqttLifecycleComponent(LifecycleComponentType type, IMqttConfiguration configuration) {
 	super(type);
+	this.configuration = configuration;
     }
 
     /**
@@ -130,7 +89,7 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
     @Override
     public void start(ILifecycleProgressMonitor monitor) throws SiteWhereException {
 	this.queue = Dispatch.createQueue(getComponentId().toString());
-	this.mqtt = MqttLifecycleComponent.configure(this, queue);
+	this.mqtt = configure();
     }
 
     /**
@@ -139,11 +98,12 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
      * @param sslContext
      * @param trustStorePath
      * @param trustStorePassword
+     * @return
      * @throws Exception
      */
-    protected static TrustManagerFactory configureTrustStore(IMqttComponent component, SSLContext sslContext,
-	    String trustStorePath, String trustStorePassword) throws Exception {
-	component.getLogger().info("MQTT client using truststore path: " + trustStorePath);
+    protected TrustManagerFactory configureTrustStore(SSLContext sslContext, String trustStorePath,
+	    String trustStorePassword) throws Exception {
+	getLogger().info("MQTT client using truststore path: " + trustStorePath);
 	TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 	KeyStore tks = KeyStore.getInstance("JKS");
 	File trustFile = new File(trustStorePath);
@@ -155,16 +115,15 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
     /**
      * Configure key store.
      * 
-     * @param component
      * @param sslContext
      * @param keyStorePath
      * @param keyStorePassword
      * @return
      * @throws Exception
      */
-    protected static KeyManagerFactory configureKeyStore(IMqttComponent component, SSLContext sslContext,
-	    String keyStorePath, String keyStorePassword) throws Exception {
-	component.getLogger().info("MQTT client using keystore path: " + keyStorePath);
+    protected KeyManagerFactory configureKeyStore(SSLContext sslContext, String keyStorePath, String keyStorePassword)
+	    throws Exception {
+	getLogger().info("MQTT client using keystore path: " + keyStorePath);
 	KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 	KeyStore ks = KeyStore.getInstance("JKS");
 	File keyFile = new File(keyStorePath);
@@ -176,15 +135,15 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
     /**
      * Handle configuration of secure transport.
      * 
-     * @param component
      * @param mqtt
      * @throws SiteWhereException
      */
-    protected static void handleSecureTransport(IMqttComponent component, MQTT mqtt) throws SiteWhereException {
-	component.getLogger().info("MQTT client using secure protocol '" + component.getProtocol() + "'.");
-	boolean trustStoreConfigured = (component.getTrustStorePath() != null)
-		&& (component.getTrustStorePassword() != null);
-	boolean keyStoreConfigured = (component.getKeyStorePath() != null) && (component.getKeyStorePassword() != null);
+    protected void handleSecureTransport(MQTT mqtt) throws SiteWhereException {
+	getLogger().info("MQTT client using secure protocol '" + configuration.getProtocol() + "'.");
+	boolean trustStoreConfigured = (getConfiguration().getTrustStorePath() != null)
+		&& (getConfiguration().getTrustStorePassword() != null);
+	boolean keyStoreConfigured = (getConfiguration().getKeyStorePath() != null)
+		&& (getConfiguration().getKeyStorePassword() != null);
 	try {
 	    SSLContext sslContext = SSLContext.getInstance("TLS");
 	    TrustManagerFactory tmf = null;
@@ -192,63 +151,63 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
 
 	    // Handle trust store configuration.
 	    if (trustStoreConfigured) {
-		tmf = configureTrustStore(component, sslContext, component.getTrustStorePath(),
-			component.getTrustStorePassword());
+		tmf = configureTrustStore(sslContext, getConfiguration().getTrustStorePath(),
+			getConfiguration().getTrustStorePassword());
 	    } else {
-		component.getLogger().info("No trust store configured for MQTT client.");
+		getLogger().info("No trust store configured for MQTT client.");
 	    }
 
 	    // Handle key store configuration.
 	    if (keyStoreConfigured) {
-		kmf = configureKeyStore(component, sslContext, component.getKeyStorePath(),
-			component.getKeyStorePassword());
+		kmf = configureKeyStore(sslContext, getConfiguration().getKeyStorePath(),
+			getConfiguration().getKeyStorePassword());
 		sslContext.init(kmf.getKeyManagers(), tmf != null ? tmf.getTrustManagers() : null, null);
 	    } else if (trustStoreConfigured) {
 		sslContext.init(null, tmf != null ? tmf.getTrustManagers() : null, null);
 	    }
 
 	    mqtt.setSslContext(sslContext);
-	    component.getLogger().info("Created SSL context for MQTT receiver.");
+	    getLogger().info("Created SSL context for MQTT receiver.");
 	} catch (Throwable t) {
 	    throw new SiteWhereException("Unable to configure secure transport.", t);
 	}
     }
 
     /**
-     * Configures MQTT parameters based on component settings.
+     * Configures MQTT connectivity based on configuration.
      * 
-     * @param component
      * @return
      * @throws SiteWhereException
      */
-    public static MQTT configure(IMqttComponent component, DispatchQueue queue) throws SiteWhereException {
+    public MQTT configure() throws SiteWhereException {
 	MQTT mqtt = new MQTT();
 
-	boolean usingSSL = component.getProtocol().startsWith("ssl");
-	boolean usingTLS = component.getProtocol().startsWith("tls");
+	boolean usingSSL = getConfiguration().getProtocol().startsWith("ssl");
+	boolean usingTLS = getConfiguration().getProtocol().startsWith("tls");
 
 	// Optionally set client id.
-	if (component.getClientId() != null) {
-	    mqtt.setClientId(component.getClientId());
-	    component.getLogger().info("MQTT connection will use client id '" + component.getClientId() + "'.");
+	if (getConfiguration().getClientId() != null) {
+	    mqtt.setClientId(getConfiguration().getClientId());
+	    getLogger().info("MQTT connection will use client id '" + getConfiguration().getClientId() + "'.");
 	}
 	// Set flag for clean session.
-	mqtt.setCleanSession(component.isCleanSession());
-	component.getLogger().info("MQTT clean session flag being set to '" + component.isCleanSession() + "'.");
+	mqtt.setCleanSession(getConfiguration().isCleanSession());
+	getLogger().info("MQTT clean session flag being set to '" + getConfiguration().isCleanSession() + "'.");
 
 	if (usingSSL || usingTLS) {
-	    handleSecureTransport(component, mqtt);
+	    handleSecureTransport(mqtt);
 	}
 	// Set username if provided.
-	if (!StringUtils.isEmpty(component.getUsername())) {
-	    mqtt.setUserName(component.getUsername());
+	if (!StringUtils.isEmpty(getConfiguration().getUsername())) {
+	    mqtt.setUserName(getConfiguration().getUsername());
 	}
 	// Set password if provided.
-	if (!StringUtils.isEmpty(component.getPassword())) {
-	    mqtt.setPassword(component.getPassword());
+	if (!StringUtils.isEmpty(getConfiguration().getPassword())) {
+	    mqtt.setPassword(getConfiguration().getPassword());
 	}
 	try {
-	    mqtt.setHost(component.getProtocol() + "://" + component.getHostname() + ":" + component.getPort());
+	    mqtt.setHost(getConfiguration().getProtocol() + "://" + getConfiguration().getHostname() + ":"
+		    + getConfiguration().getPort());
 	    return mqtt;
 	} catch (URISyntaxException e) {
 	    throw new SiteWhereException("Invalid hostname for MQTT server.", e);
@@ -269,169 +228,11 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent imple
 	}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getProtocol()
-     */
-    @Override
-    public String getProtocol() {
-	return protocol;
+    protected IMqttConfiguration getConfiguration() {
+	return configuration;
     }
 
-    public void setProtocol(String protocol) {
-	this.protocol = protocol;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getHostname()
-     */
-    @Override
-    public String getHostname() {
-	return hostname;
-    }
-
-    public void setHostname(String hostname) {
-	this.hostname = hostname;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getPort()
-     */
-    @Override
-    public String getPort() {
-	return port;
-    }
-
-    public void setPort(String port) {
-	this.port = port;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getUsername()
-     */
-    @Override
-    public String getUsername() {
-	return username;
-    }
-
-    public void setUsername(String username) {
-	this.username = username;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getPassword()
-     */
-    @Override
-    public String getPassword() {
-	return password;
-    }
-
-    public void setPassword(String password) {
-	this.password = password;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.sitewhere.device.communication.mqtt.IMqttComponent#getTrustStorePath( )
-     */
-    @Override
-    public String getTrustStorePath() {
-	return trustStorePath;
-    }
-
-    public void setTrustStorePath(String trustStorePath) {
-	this.trustStorePath = trustStorePath;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#
-     * getTrustStorePassword()
-     */
-    @Override
-    public String getTrustStorePassword() {
-	return trustStorePassword;
-    }
-
-    public void setTrustStorePassword(String trustStorePassword) {
-	this.trustStorePassword = trustStorePassword;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getKeyStorePath()
-     */
-    public String getKeyStorePath() {
-	return keyStorePath;
-    }
-
-    public void setKeyStorePath(String keyStorePath) {
-	this.keyStorePath = keyStorePath;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#
-     * getKeyStorePassword()
-     */
-    public String getKeyStorePassword() {
-	return keyStorePassword;
-    }
-
-    public void setKeyStorePassword(String keyStorePassword) {
-	this.keyStorePassword = keyStorePassword;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getClientId()
-     */
-    public String getClientId() {
-	return clientId;
-    }
-
-    public void setClientId(String clientId) {
-	this.clientId = clientId;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#isCleanSession()
-     */
-    public boolean isCleanSession() {
-	return cleanSession;
-    }
-
-    public void setCleanSession(boolean cleanSession) {
-	this.cleanSession = cleanSession;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.sitewhere.device.communication.mqtt.IMqttComponent#getQos()
-     */
-    public String getQos() {
-	return qos;
-    }
-
-    public void setQos(String qos) {
-	this.qos = qos;
+    protected DispatchQueue getQueue() {
+	return queue;
     }
 }

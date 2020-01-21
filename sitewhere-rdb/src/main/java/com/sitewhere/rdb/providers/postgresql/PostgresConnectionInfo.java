@@ -7,12 +7,27 @@
  */
 package com.sitewhere.rdb.providers.postgresql;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sitewhere.microservice.configuration.json.JsonConfiguration;
 import com.sitewhere.rdb.spi.IConnectionInformation;
+import com.sitewhere.spi.SiteWhereException;
 
 /**
  * Information used to connect to a PostgreSQL database.
  */
-public class PostgresConnectionInfo implements IConnectionInformation {
+public class PostgresConnectionInfo extends JsonConfiguration implements IConnectionInformation {
+
+    /** Default PostgreSQL server hostname */
+    private static final String DEFAULT_HOSTNAME = "postgres";
+
+    /** Default PostgreSQL server port */
+    private static final int DEFAULT_PORT = 5432;
+
+    /** Default PostgreSQL server username */
+    private static final String DEFAULT_USERNAME = "postgres";
+
+    /** Default PostgreSQL server password */
+    private static final String DEFAULT_PASSWORD = "";
 
     /** Database hostname */
     private String hostname;
@@ -25,6 +40,15 @@ public class PostgresConnectionInfo implements IConnectionInformation {
 
     /** Database password */
     private String password;
+
+    public PostgresConnectionInfo loadFrom(JsonNode configuration) throws SiteWhereException {
+	PostgresConnectionInfo conn = new PostgresConnectionInfo();
+	this.hostname = configurableString("hostname", configuration, DEFAULT_HOSTNAME);
+	this.port = configurableInt("port", configuration, DEFAULT_PORT);
+	this.username = configurableString("username", configuration, DEFAULT_USERNAME);
+	this.password = configurableString("password", configuration, DEFAULT_PASSWORD);
+	return conn;
+    }
 
     public String getHostname() {
 	return hostname;

@@ -7,8 +7,10 @@
  */
 package com.sitewhere.rdb;
 
+import com.sitewhere.datastore.DatastoreDefinition;
 import com.sitewhere.microservice.lifecycle.CompositeLifecycleStep;
 import com.sitewhere.microservice.multitenant.MicroserviceTenantEngine;
+import com.sitewhere.rdb.providers.RdbProviderHandler;
 import com.sitewhere.rdb.spi.IRdbEntityManagerProvider;
 import com.sitewhere.rdb.spi.IRdbTenantEngine;
 import com.sitewhere.spi.SiteWhereException;
@@ -85,6 +87,15 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
 
 	// Execute shutdown steps.
 	stop.execute(monitor);
+    }
+
+    /*
+     * @see com.sitewhere.rdb.spi.IRdbTenantEngine#getProviderInformation()
+     */
+    @Override
+    public RdbProviderInformation<?> getProviderInformation() throws SiteWhereException {
+	DatastoreDefinition datastore = getDatastoreDefinition();
+	return RdbProviderHandler.getProviderInformation(datastore);
     }
 
     /*

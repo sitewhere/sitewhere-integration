@@ -9,8 +9,10 @@ package com.sitewhere.rdb.spi;
 
 import javax.persistence.EntityManager;
 
+import com.sitewhere.datastore.DatastoreDefinition;
 import com.sitewhere.rdb.RdbPersistenceOptions;
 import com.sitewhere.rdb.RdbProviderInformation;
+import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.microservice.multitenant.IMicroserviceTenantEngine;
 import com.sitewhere.spi.microservice.multitenant.ITenantEngineConfiguration;
 
@@ -22,11 +24,19 @@ import com.sitewhere.spi.microservice.multitenant.ITenantEngineConfiguration;
 public interface IRdbTenantEngine<T extends ITenantEngineConfiguration> extends IMicroserviceTenantEngine<T> {
 
     /**
-     * Get connection provider information.
+     * Get datastore definition from tenant engine configuration.
      * 
      * @return
      */
-    RdbProviderInformation<?> getProviderInformation();
+    DatastoreDefinition getDatastoreDefinition();
+
+    /**
+     * Get connection provider information.
+     * 
+     * @return
+     * @throws SiteWhereException
+     */
+    RdbProviderInformation<?> getProviderInformation() throws SiteWhereException;
 
     /**
      * Get options related to relational persistence.

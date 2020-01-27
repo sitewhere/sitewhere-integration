@@ -8,6 +8,7 @@
 package com.sitewhere.rdb.entities;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -24,7 +25,7 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
     private static final long serialVersionUID = 7969849077443762835L;
 
     /** Unique token */
-    @Column(name = "token")
+    @Column(name = "token", unique = true)
     private String token;
 
     /** Date entity was created */
@@ -43,6 +44,10 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    /*
+     * @see com.sitewhere.spi.common.IPersistentEntity#getToken()
+     */
+    @Override
     public String getToken() {
 	return token;
     }
@@ -51,6 +56,10 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
 	this.token = token;
     }
 
+    /*
+     * @see com.sitewhere.spi.common.IPersistentEntity#getCreatedDate()
+     */
+    @Override
     public Date getCreatedDate() {
 	return createdDate;
     }
@@ -59,6 +68,10 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
 	this.createdDate = createdDate;
     }
 
+    /*
+     * @see com.sitewhere.spi.common.IPersistentEntity#getCreatedBy()
+     */
+    @Override
     public String getCreatedBy() {
 	return createdBy;
     }
@@ -67,6 +80,10 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
 	this.createdBy = createdBy;
     }
 
+    /*
+     * @see com.sitewhere.spi.common.IPersistentEntity#getUpdatedDate()
+     */
+    @Override
     public Date getUpdatedDate() {
 	return updatedDate;
     }
@@ -75,6 +92,10 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
 	this.updatedDate = updatedDate;
     }
 
+    /*
+     * @see com.sitewhere.spi.common.IPersistentEntity#getUpdatedBy()
+     */
+    @Override
     public String getUpdatedBy() {
 	return updatedBy;
     }
@@ -82,6 +103,13 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
     public void setUpdatedBy(String updatedBy) {
 	this.updatedBy = updatedBy;
     }
+
+    /**
+     * Implemented in subclasses to set metadata.
+     * 
+     * @param metadata
+     */
+    public abstract void setMetadata(Map<String, String> metadata);
 
     public static void copy(IPersistentEntity source, RdbPersistentEntity target) {
 	if (source.getToken() != null) {
@@ -98,6 +126,9 @@ public abstract class RdbPersistentEntity implements IPersistentEntity {
 	}
 	if (source.getUpdatedBy() != null) {
 	    target.setUpdatedBy(source.getUpdatedBy());
+	}
+	if (source.getMetadata() != null) {
+	    target.setMetadata(source.getMetadata());
 	}
     }
 }

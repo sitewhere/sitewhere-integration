@@ -111,6 +111,7 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	getDataSource().setJdbcUrl(getProvider().buildJdbcUrl(getDatabaseName()));
 	getDataSource().setUser(getProvider().getConnectionInfo().getUsername());
 	getDataSource().setPassword(getProvider().getConnectionInfo().getPassword());
+	getDataSource().setMaxPoolSize(getProvider().getConnectionInfo().getMaxConnections());
 
 	// Execute Flyway migration.
 	FlywayConfig.migrateTenantData(getDataSource(), getMicroservice().getIdentifier());
@@ -255,7 +256,7 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	} catch (NoResultException e) {
 	    return null;
 	} catch (NonUniqueResultException e) {
-	    throw new SiteWhereException("Expected on result but found multiple.", e);
+	    throw new SiteWhereException("Expected one result but found multiple.", e);
 	} catch (Throwable e) {
 	    throw new SiteWhereException("Unhandled exception retrieving single element.", e);
 	}
@@ -326,7 +327,7 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 
 	// Handle paging.
 	if (criteria.getPageSize() > 0) {
-	    int start = criteria.getPageNumber() * criteria.getPageSize() - 1;
+	    int start = (criteria.getPageNumber() - 1) * criteria.getPageSize();
 	    if (start < 0) {
 		start = 0;
 	    }
@@ -344,6 +345,7 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 
 	TypedQuery<Long> counterQuery = getEntityManager().createQuery(counter);
 	Long count = counterQuery.getSingleResult();
+
 	return new SearchResults<T>(results, count);
     }
 

@@ -25,4 +25,11 @@ public interface IConnectionInformation {
      * @return
      */
     String getPassword();
+
+    /**
+     * Get max database connections for pool.
+     * 
+     * @return
+     */
+    int getMaxConnections();
 }

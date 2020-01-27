@@ -29,6 +29,9 @@ public class PostgresConnectionInfo extends JsonConfiguration implements IConnec
     /** Default PostgreSQL server password */
     private static final String DEFAULT_PASSWORD = "";
 
+    /** Default max connections */
+    private static final int DEFAULT_MAX_CONNECTIONS = 5;
+
     /** Database hostname */
     private String hostname;
 
@@ -41,12 +44,16 @@ public class PostgresConnectionInfo extends JsonConfiguration implements IConnec
     /** Database password */
     private String password;
 
+    /** Max number of database connections */
+    private int maxConnections;
+
     public PostgresConnectionInfo loadFrom(JsonNode configuration) throws SiteWhereException {
 	PostgresConnectionInfo conn = new PostgresConnectionInfo();
 	this.hostname = configurableString("hostname", configuration, DEFAULT_HOSTNAME);
 	this.port = configurableInt("port", configuration, DEFAULT_PORT);
 	this.username = configurableString("username", configuration, DEFAULT_USERNAME);
 	this.password = configurableString("password", configuration, DEFAULT_PASSWORD);
+	this.maxConnections = configurableInt("maxConnections", configuration, DEFAULT_MAX_CONNECTIONS);
 	return conn;
     }
 
@@ -88,5 +95,17 @@ public class PostgresConnectionInfo extends JsonConfiguration implements IConnec
 
     public void setPassword(String password) {
 	this.password = password;
+    }
+
+    /*
+     * @see com.sitewhere.rdb.spi.IConnectionInformation#getMaxConnections()
+     */
+    @Override
+    public int getMaxConnections() {
+	return maxConnections;
+    }
+
+    public void setMaxConnections(int maxConnections) {
+	this.maxConnections = maxConnections;
     }
 }

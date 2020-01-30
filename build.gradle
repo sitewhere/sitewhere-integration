@@ -4,14 +4,14 @@ plugins {
     id 'com.github.hierynomus.license' version '0.15.0' 
 }
 
-ext['sitewhere.microservice.api.version'] = '3.0.0.alpha18'
+ext['sitewhere.microservice.api.version'] = '3.0.0.alpha19'
 ext['protobuf.version'] = '3.5.1'
 ext['mongodb.version'] = '3.10.1'
 ext['solr.version'] = '6.4.0'
 
 allprojects {
     group = 'com.sitewhere'
-	version = '3.0.0.alpha13'
+	version = '3.0.0.alpha14'
 	
     repositories {
         mavenCentral()
@@ -33,6 +33,8 @@ subprojects {
     
     // Common dependencies used for all projects.
     dependencies {	
+    	compile platform('io.quarkus:quarkus-bom:1.2.0.Final')
+    	
     	// Testing dependencies.
 		testCompile group: 'junit', name: 'junit', version: '4.12'
     }

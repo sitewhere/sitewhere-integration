@@ -1,9 +1,6 @@
 description = 'SiteWhere RDB Implementation'
 
 dependencies {
-	// Confirm to Quarkus BOM.
-    compile enforcedPlatform('io.quarkus:quarkus-bom:1.0.1.Final')
-	    
 	// SiteWhere microservice library.
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
    	    

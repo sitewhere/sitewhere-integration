@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sitewhere.microservice.configuration.json.JsonConfiguration;
 import com.sitewhere.rdb.spi.IConnectionInformation;
 import com.sitewhere.spi.SiteWhereException;
+import com.sitewhere.spi.microservice.lifecycle.ITenantEngineLifecycleComponent;
 
 /**
  * Information used to connect to a PostgreSQL database.
@@ -47,8 +48,12 @@ public class PostgresConnectionInfo extends JsonConfiguration implements IConnec
     /** Max number of database connections */
     private int maxConnections;
 
+    public PostgresConnectionInfo(ITenantEngineLifecycleComponent component) {
+	super(component);
+    }
+
     public PostgresConnectionInfo loadFrom(JsonNode configuration) throws SiteWhereException {
-	PostgresConnectionInfo conn = new PostgresConnectionInfo();
+	PostgresConnectionInfo conn = new PostgresConnectionInfo(getComponent());
 	this.hostname = configurableString("hostname", configuration, DEFAULT_HOSTNAME);
 	this.port = configurableInt("port", configuration, DEFAULT_PORT);
 	this.username = configurableString("username", configuration, DEFAULT_USERNAME);

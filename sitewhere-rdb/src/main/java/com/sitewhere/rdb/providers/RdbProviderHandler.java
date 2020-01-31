@@ -12,6 +12,7 @@ import com.sitewhere.rdb.RdbProviderInformation;
 import com.sitewhere.rdb.providers.postgresql.Postgres95Provider;
 import com.sitewhere.rdb.providers.postgresql.PostgresConnectionInfo;
 import com.sitewhere.spi.SiteWhereException;
+import com.sitewhere.spi.microservice.lifecycle.ITenantEngineLifecycleComponent;
 
 /**
  * Utility class for building RDB providers based on types specified in generic
@@ -19,11 +20,11 @@ import com.sitewhere.spi.SiteWhereException;
  */
 public class RdbProviderHandler {
 
-    public static RdbProviderInformation<?> getProviderInformation(DatastoreDefinition datastore)
-	    throws SiteWhereException {
+    public static RdbProviderInformation<?> getProviderInformation(ITenantEngineLifecycleComponent component,
+	    DatastoreDefinition datastore) throws SiteWhereException {
 	switch (datastore.getType()) {
 	case "postgres95": {
-	    PostgresConnectionInfo connInfo = new PostgresConnectionInfo();
+	    PostgresConnectionInfo connInfo = new PostgresConnectionInfo(component);
 	    connInfo.loadFrom(datastore.getConfiguration());
 	    return new Postgres95Provider(connInfo);
 	}

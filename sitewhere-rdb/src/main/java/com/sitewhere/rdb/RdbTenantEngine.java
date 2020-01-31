@@ -95,7 +95,7 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
     @Override
     public RdbProviderInformation<?> getProviderInformation() throws SiteWhereException {
 	DatastoreDefinition datastore = getDatastoreDefinition();
-	return RdbProviderHandler.getProviderInformation(datastore);
+	return RdbProviderHandler.getProviderInformation(this, datastore);
     }
 
     /*

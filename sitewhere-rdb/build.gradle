@@ -1,11 +1,10 @@
 description = 'SiteWhere RDB Implementation'
 
 dependencies {
+	compile project(':sitewhere-datastore')
+
 	// SiteWhere microservice library.
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
-   	    
-	// SiteWhere datastore library.
-    compile group: 'com.sitewhere', name: 'sitewhere-datastore', version: "${project.version}"
     
     // Relational DB libraries.
     compile ('org.hibernate:hibernate-core') {

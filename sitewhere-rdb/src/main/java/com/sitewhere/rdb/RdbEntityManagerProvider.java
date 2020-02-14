@@ -148,9 +148,10 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void run() {
-	    getLogger().info("Attempting to connect to database ...");
+	    String rootUrl = getProvider().buildRootJdbcUrl();
+	    getLogger().info(String.format("Attempting to connect to database at '%s' ...", rootUrl));
 	    Callable<Boolean> connectCheck = () -> {
-		Connection connection = DriverManager.getConnection(getProvider().buildRootJdbcUrl(),
+		Connection connection = DriverManager.getConnection(rootUrl,
 			getProvider().getConnectionInfo().getUsername(),
 			getProvider().getConnectionInfo().getPassword());
 		String dbname = getDatabaseName();

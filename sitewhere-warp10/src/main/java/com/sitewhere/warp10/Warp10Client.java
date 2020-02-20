@@ -10,9 +10,7 @@ package com.sitewhere.warp10;
 import java.util.List;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
-import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 import com.sitewhere.warp10.rest.GTSInput;
 import com.sitewhere.warp10.rest.GTSOutput;
@@ -27,34 +25,10 @@ public class Warp10Client extends TenantEngineLifecycleComponent {
     /** Warp10 configuration parameters */
     private Warp10Configuration configuration;
 
-    /** Hostname parameter */
-    private ILifecycleComponentParameter<String> baseUrl;
-
-    /** Port parameter */
-    private ILifecycleComponentParameter<String> tokenSecret;
-
     private Warp10RestClient warp10RestClient;
 
     public Warp10Client(Warp10Configuration configuration) {
 	this.configuration = configuration;
-    }
-
-    /*
-     * @see
-     * com.sitewhere.microservice.lifecycle.LifecycleComponent#initializeParameters(
-     * )
-     */
-    @Override
-    public void initializeParameters() throws SiteWhereException {
-	// Add base URL.
-	this.baseUrl = StringComponentParameter.newBuilder(this, "Base URL").value(getConfiguration().getBaseUrl())
-		.makeRequired().build();
-	getParameters().add(baseUrl);
-
-	// Add token secret.
-	this.tokenSecret = StringComponentParameter.newBuilder(this, "Token secret")
-		.value(getConfiguration().getTokenSecret()).makeRequired().build();
-	getParameters().add(tokenSecret);
     }
 
     /*
@@ -64,8 +38,10 @@ public class Warp10Client extends TenantEngineLifecycleComponent {
     @Override
     public void initialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
 	super.initialize(monitor);
-	this.warp10RestClient = Warp10RestClient.newBuilder().withConnectionTo(getConfiguration().getBaseUrl(),
-		getConfiguration().getTokenSecret(), getTenantEngine().getName()).build();
+	String baseUrl = String.format("http://%s:%d/api/v0", getConfiguration().getHostname(), 8080);
+	this.warp10RestClient = Warp10RestClient.newBuilder()
+		.withConnectionTo(baseUrl, getConfiguration().getTokenSecret(), getConfiguration().getApplication())
+		.build();
     }
 
     public int insertGTS(GTSInput gtsInput) throws SiteWhereException {

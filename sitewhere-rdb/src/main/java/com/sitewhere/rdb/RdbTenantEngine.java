@@ -8,6 +8,7 @@
 package com.sitewhere.rdb;
 
 import com.sitewhere.datastore.DatastoreDefinition;
+import com.sitewhere.microservice.configuration.model.instance.persistence.RdbConfiguration;
 import com.sitewhere.microservice.lifecycle.CompositeLifecycleStep;
 import com.sitewhere.microservice.multitenant.MicroserviceTenantEngine;
 import com.sitewhere.rdb.providers.RdbProviderHandler;
@@ -95,7 +96,30 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
     @Override
     public RdbProviderInformation<?> getProviderInformation() throws SiteWhereException {
 	DatastoreDefinition datastore = getDatastoreDefinition();
-	return RdbProviderHandler.getProviderInformation(this, datastore);
+
+	// Handle global reference.
+	if (datastore.getReference() != null) {
+	    RdbConfiguration rdb = getMicroservice().getInstanceConfiguration().getPersistenceConfigurations()
+		    .getRdbConfigurations().get(datastore.getReference());
+	    if (rdb == null) {
+		throw new SiteWhereException(
+			String.format("Tenant engine references missing global datastore configuration '%s'.",
+				datastore.getReference()));
+	    }
+	    DatastoreDefinition global = new DatastoreDefinition();
+	    global.setType(rdb.getType());
+	    global.setConfiguration(rdb.getConfiguration());
+
+	    getLogger().info(
+		    String.format("Using datastore definition defined globally as '%s'.", datastore.getReference()));
+	    return RdbProviderHandler.getProviderInformation(this, global);
+	}
+
+	// Handle local definition.
+	else {
+	    getLogger().info("Using datastore definition defined locally.");
+	    return RdbProviderHandler.getProviderInformation(this, datastore);
+	}
     }
 
     /*

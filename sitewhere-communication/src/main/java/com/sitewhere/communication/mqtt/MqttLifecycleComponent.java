@@ -74,7 +74,7 @@ public class MqttLifecycleComponent extends TenantEngineLifecycleComponent {
      */
     @Override
     public void start(ILifecycleProgressMonitor monitor) throws SiteWhereException {
-	this.mqtt = MqttConfigurer.configure(getConfiguration());
+	this.mqtt = MqttConfigurer.configure(configuration);
     }
 
     protected IMqttConfiguration getConfiguration() {

@@ -9,7 +9,7 @@ package com.sitewhere.rdb.spi;
 
 import javax.persistence.EntityManager;
 
-import com.sitewhere.datastore.DatastoreDefinition;
+import com.sitewhere.microservice.datastore.DatastoreDefinition;
 import com.sitewhere.rdb.RdbPersistenceOptions;
 import com.sitewhere.rdb.RdbProviderInformation;
 import com.sitewhere.spi.SiteWhereException;

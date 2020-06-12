@@ -7,7 +7,7 @@
  */
 package com.sitewhere.rdb.providers;
 
-import com.sitewhere.datastore.DatastoreDefinition;
+import com.sitewhere.microservice.datastore.DatastoreDefinition;
 import com.sitewhere.rdb.RdbProviderInformation;
 import com.sitewhere.rdb.providers.postgresql.Postgres95Provider;
 import com.sitewhere.rdb.providers.postgresql.PostgresConnectionInfo;

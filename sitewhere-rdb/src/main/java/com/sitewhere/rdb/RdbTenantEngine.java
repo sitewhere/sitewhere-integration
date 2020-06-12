@@ -7,8 +7,8 @@
  */
 package com.sitewhere.rdb;
 
-import com.sitewhere.datastore.DatastoreDefinition;
 import com.sitewhere.microservice.configuration.model.instance.persistence.RdbConfiguration;
+import com.sitewhere.microservice.datastore.DatastoreDefinition;
 import com.sitewhere.microservice.lifecycle.CompositeLifecycleStep;
 import com.sitewhere.microservice.multitenant.MicroserviceTenantEngine;
 import com.sitewhere.rdb.providers.RdbProviderHandler;

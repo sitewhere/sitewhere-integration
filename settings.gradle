@@ -1,7 +1,6 @@
 rootProject.name = 'sitewhere-integration'
 include ':sitewhere-cassandra'
 include ':sitewhere-communication'
-include ':sitewhere-datastore'
 include ':sitewhere-influxdb'
 include ':sitewhere-rdb'
 include ':sitewhere-solr'
@@ -9,7 +8,6 @@ include ':sitewhere-warp10'
 
 project(':sitewhere-cassandra').projectDir = "$rootDir/sitewhere-cassandra" as File
 project(':sitewhere-communication').projectDir = "$rootDir/sitewhere-communication" as File
-project(':sitewhere-datastore').projectDir = "$rootDir/sitewhere-datastore" as File
 project(':sitewhere-influxdb').projectDir = "$rootDir/sitewhere-influxdb" as File
 project(':sitewhere-rdb').projectDir = "$rootDir/sitewhere-rdb" as File
 project(':sitewhere-solr').projectDir = "$rootDir/sitewhere-solr" as File

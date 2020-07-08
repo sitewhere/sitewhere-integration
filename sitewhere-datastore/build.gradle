@@ -1,7 +1,7 @@
 description = 'SiteWhere Common Datastore Support'
 
 dependencies {
-	// SiteWhere microservice library.	
+	// SiteWhere microservice library.
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
 }
 
@@ -15,7 +15,7 @@ task javadocJar(type: Jar) {
     classifier = 'javadoc'
 }
 
-// Publish jar.	
+// Publish jar.
 apply plugin: 'maven-publish'
 publishing {
 	publications {
@@ -44,21 +44,22 @@ publishing {
                     connection = 'https://github.com/sitewhere/sitewhere-integration.git'
                     url = 'https://github.com/sitewhere/sitewhere-integration'
                 }
-			}	
+			}
 		}
 	}
     repositories {
-        maven {
+        /*maven {
             url project.nexusUrl
             credentials {
                 username project.nexusUsername
                 password project.nexusPassword
             }
-        }
+        }*/
+        mavenLocal()
     }
 }
 
-apply plugin: 'signing'
+/*apply plugin: 'signing'
 signing {
     sign publishing.publications.mavenJava
-}
+}*/

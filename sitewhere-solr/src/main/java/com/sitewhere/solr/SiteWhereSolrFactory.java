@@ -7,6 +7,7 @@
  */
 package com.sitewhere.solr;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -132,12 +133,12 @@ public class SiteWhereSolrFactory {
 	    throw new SiteWhereException("Invalid location document. No location data stored.");
 	}
 	String[] split = latLong.get(0).split("[,]");
-	location.setLatitude(Double.parseDouble(split[0].trim()));
-	location.setLongitude(Double.parseDouble(split[1].trim()));
+	location.setLatitude(new BigDecimal(split[0].trim()));
+	location.setLongitude(new BigDecimal(split[1].trim()));
 
 	Double elevation = (Double) document.get(ISolrFields.ELEVATION);
 	if (elevation != null) {
-	    location.setElevation(elevation);
+	    location.setElevation(new BigDecimal(elevation));
 	}
 
 	addFieldsFromEventDocument(document, location);
@@ -158,7 +159,7 @@ public class SiteWhereSolrFactory {
 	Double value = (Double) document.get(ISolrFields.MX_VALUE);
 
 	mx.setName(name);
-	mx.setValue(value);
+	mx.setValue(new BigDecimal(value));
 
 	addFieldsFromEventDocument(document, mx);
 	return mx;

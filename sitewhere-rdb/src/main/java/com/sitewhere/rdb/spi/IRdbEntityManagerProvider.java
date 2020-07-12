@@ -46,13 +46,23 @@ public interface IRdbEntityManagerProvider extends ITenantEngineLifecycleCompone
     Class<?>[] getEntityClasses();
 
     /**
+     * Execute code in the context of a transaction.
+     * 
+     * @param <T>
+     * @param callback
+     * @return
+     * @throws SiteWhereException
+     */
+    <T> T runInTransaction(ITransactionCallback<T> callback) throws SiteWhereException;
+
+    /**
      * Persist an entity via the {@link EntityManager}.
      * 
      * @param <T>
      * @param created
      * @throws SiteWhereException
      */
-    <T> void persist(T created) throws SiteWhereException;
+    <T> T persist(T created) throws SiteWhereException;
 
     /**
      * Merge updates into the database.

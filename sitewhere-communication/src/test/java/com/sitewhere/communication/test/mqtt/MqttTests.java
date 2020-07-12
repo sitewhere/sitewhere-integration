@@ -7,6 +7,7 @@
  */
 package com.sitewhere.communication.test.mqtt;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
@@ -110,9 +111,9 @@ public class MqttTests {
 	    request.setType(Type.DeviceLocation);
 	    DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
 	    location.setEventDate(new Date());
-	    location.setLatitude(34.10469794977326);
-	    location.setLongitude(-84.23966646194458);
-	    location.setElevation(0.0);
+	    location.setLatitude(new BigDecimal("34.10469794977326"));
+	    location.setLongitude(new BigDecimal("-84.23966646194458"));
+	    location.setElevation(new BigDecimal("0.0"));
 	    Map<String, String> metadata = new HashMap<String, String>();
 	    metadata.put("fromMQTT", "true");
 	    location.setMetadata(metadata);
@@ -171,7 +172,7 @@ public class MqttTests {
 	    request.setType(Type.DeviceMeasurement);
 	    DeviceMeasurementCreateRequest mx = new DeviceMeasurementCreateRequest();
 	    mx.setName("normal");
-	    mx.setValue(1.234);
+	    mx.setValue(new BigDecimal("1.234"));
 	    Map<String, String> metadata = new HashMap<String, String>();
 	    metadata.put("fromMQTT", "true");
 	    mx.setMetadata(metadata);
@@ -206,9 +207,9 @@ public class MqttTests {
 
 	    DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
 	    location.setEventDate(new Date());
-	    location.setLatitude(34.10469794977326);
-	    location.setLongitude(-84.23966646194458);
-	    location.setElevation(0.0);
+	    location.setLatitude(new BigDecimal("34.10469794977326"));
+	    location.setLongitude(new BigDecimal("-84.23966646194458"));
+	    location.setElevation(new BigDecimal("0.0"));
 	    Map<String, String> metadata = new HashMap<String, String>();
 	    metadata.put("metadata", "value");
 	    location.setMetadata(metadata);
@@ -217,7 +218,7 @@ public class MqttTests {
 
 	    DeviceMeasurementCreateRequest mx = new DeviceMeasurementCreateRequest();
 	    mx.setName("fuel.level");
-	    mx.setValue(123.45);
+	    mx.setValue(new BigDecimal("123.45"));
 	    location.setMetadata(metadata);
 	    location.setUpdateState(true);
 	    request.getMeasurements().add(mx);

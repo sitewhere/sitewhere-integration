@@ -7,6 +7,7 @@
  */
 package com.sitewhere.communication.test.coap;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class CoapTests {
 	CoapClient client = createClientFor(getBaseDeviceUrl() + "/measurements");
 	DeviceMeasurementCreateRequest mx = new DeviceMeasurementCreateRequest();
 	mx.setName("pwr");
-	mx.setValue(38.23);
+	mx.setValue(new BigDecimal("38.23"));
 	mx.setEventDate(new Date());
 	handleResponse(client.post(MarshalUtils.marshalJson(mx), MediaTypeRegistry.APPLICATION_JSON));
     }
@@ -79,9 +80,9 @@ public class CoapTests {
     public void testAddDeviceLocation() throws Exception {
 	CoapClient client = createClientFor(getBaseDeviceUrl() + "/locations");
 	DeviceLocationCreateRequest location = new DeviceLocationCreateRequest();
-	location.setLatitude(33.7490);
-	location.setLongitude(-84.3880);
-	location.setElevation(0.0);
+	location.setLatitude(new BigDecimal("33.7490"));
+	location.setLongitude(new BigDecimal("-84.3880"));
+	location.setElevation(new BigDecimal("0.0"));
 	handleResponse(client.post(MarshalUtils.marshalJson(location), MediaTypeRegistry.APPLICATION_JSON));
     }
 

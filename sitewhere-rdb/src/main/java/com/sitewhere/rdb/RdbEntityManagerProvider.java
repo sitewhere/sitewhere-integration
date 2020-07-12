@@ -39,6 +39,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.rdb.spi.IRdbEntityManagerProvider;
 import com.sitewhere.rdb.spi.IRdbQueryProvider;
+import com.sitewhere.rdb.spi.ITransactionCallback;
 import com.sitewhere.rest.model.search.SearchResults;
 import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
@@ -199,21 +200,41 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
     }
 
     /*
+     * @see com.sitewhere.rdb.spi.IRdbEntityManagerProvider#runInTransaction(com.
+     * sitewhere.rdb.spi.ITransactionCallback)
+     */
+    @Override
+    public <T> T runInTransaction(ITransactionCallback<T> callback) throws SiteWhereException {
+	EntityTransaction transaction = getEntityManager().getTransaction();
+	if (!transaction.isActive()) {
+	    transaction.begin();
+	    try {
+		T result = callback.process();
+		transaction.commit();
+		return result;
+	    } catch (Exception e) {
+		transaction.rollback();
+		getLogger().error("Transaction failed.", e);
+		throw new SiteWhereException("Transaction failed.", e);
+	    }
+	} else {
+	    return callback.process();
+	}
+    }
+
+    /*
      * @see
      * com.sitewhere.rdb.spi.IRdbEntityManagerProvider#persist(java.lang.Object)
      */
     @Override
-    public <T> void persist(T created) throws SiteWhereException {
-	EntityTransaction tx = getEntityManager().getTransaction();
-	try {
-	    tx.begin();
-	    getEntityManager().persist(created);
-	    tx.commit();
-	} catch (Exception e) {
-	    tx.rollback();
-	    getLogger().error("Entity persist failed.", e);
-	    throw new SiteWhereException("Entity persist failed.", e);
-	}
+    public <T> T persist(T created) throws SiteWhereException {
+	return runInTransaction(new ITransactionCallback<T>() {
+
+	    @Override
+	    public T process() {
+		return getEntityManager().merge(created);
+	    }
+	});
     }
 
     /*
@@ -221,17 +242,13 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
      */
     @Override
     public <T> T merge(T updated) throws SiteWhereException {
-	EntityTransaction tx = getEntityManager().getTransaction();
-	try {
-	    tx.begin();
-	    T result = getEntityManager().merge(updated);
-	    tx.commit();
-	    return result;
-	} catch (Exception e) {
-	    tx.rollback();
-	    getLogger().error("Entity merge failed.", e);
-	    throw new SiteWhereException("Entity merge failed.", e);
-	}
+	return runInTransaction(new ITransactionCallback<T>() {
+
+	    @Override
+	    public T process() {
+		return getEntityManager().merge(updated);
+	    }
+	});
     }
 
     /*
@@ -283,19 +300,17 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
      */
     @Override
     public <T> T remove(Object key, Class<T> clazz) throws SiteWhereException {
-	EntityTransaction tx = getEntityManager().getTransaction();
-	try {
-	    tx.begin();
-	    T existing = getEntityManager().find(clazz, key);
-	    if (existing != null) {
-		getEntityManager().remove(existing);
+	return runInTransaction(new ITransactionCallback<T>() {
+
+	    @Override
+	    public T process() {
+		T existing = getEntityManager().find(clazz, key);
+		if (existing != null) {
+		    getEntityManager().remove(existing);
+		}
+		return existing;
 	    }
-	    tx.commit();
-	    return existing;
-	} catch (Exception e) {
-	    tx.rollback();
-	    throw new SiteWhereException("Entity remove failed.", e);
-	}
+	});
     }
 
     /*

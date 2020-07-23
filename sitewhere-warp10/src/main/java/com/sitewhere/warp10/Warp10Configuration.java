@@ -13,9 +13,6 @@ import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.microservice.lifecycle.ITenantEngineLifecycleComponent;
 
 /**
- * Common configuration settings for an Warp 10 client.
- */
-/**
  * Manages properties used to configure a Warp 10 connection.
  */
 public class Warp10Configuration extends JsonConfiguration {

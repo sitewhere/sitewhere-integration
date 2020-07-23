@@ -4,7 +4,7 @@ dependencies {
 	// SiteWhere microservice library.	
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
     
-    compile group: 'org.influxdb', name: 'influxdb-java', version:'2.8'
+    compile group: 'org.influxdb', name: 'influxdb-java', version:'2.19'
 }
 
 task sourcesJar(type: Jar) {

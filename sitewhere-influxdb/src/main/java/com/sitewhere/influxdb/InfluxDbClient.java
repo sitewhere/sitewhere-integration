@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDB.LogLevel;
 import org.influxdb.InfluxDBFactory;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
@@ -25,7 +27,7 @@ import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 public class InfluxDbClient extends TenantEngineLifecycleComponent {
 
     /** InfluxDB configuration parameters */
-    private InfluxConfiguration configuration;
+    private InfluxDbConfiguration configuration;
 
     /** InfluxDB handle */
     private InfluxDB influx;
@@ -36,7 +38,7 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
     /** Database parameter */
     private ILifecycleComponentParameter<String> database;
 
-    public InfluxDbClient(InfluxConfiguration configuration) {
+    public InfluxDbClient(InfluxDbConfiguration configuration) {
 	this.configuration = configuration;
     }
 
@@ -63,17 +65,22 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
      */
     @Override
     public void initialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
-	super.start(monitor);
+	super.initialize(monitor);
 
 	String connectionUrl = "http://" + getHostname().getValue() + ":" + getConfiguration().getPort();
 	this.influx = InfluxDBFactory.connect(connectionUrl, getConfiguration().getUsername(),
 		getConfiguration().getPassword());
-	influx.createDatabase(getDatabase().getValue());
+	QueryResult result = getInflux()
+		.query(new Query(String.format("CREATE DATABASE \"%s\";", getDatabase().getValue()), ""));
+	String error = result.getError();
+	if (error != null) {
+	    getLogger().error(String.format("Error creating database. %s", error));
+	}
 	if (getConfiguration().isEnableBatch()) {
-	    influx.enableBatch(getConfiguration().getBatchChunkSize(), getConfiguration().getBatchIntervalMs(),
+	    getInflux().enableBatch(getConfiguration().getBatchChunkSize(), getConfiguration().getBatchIntervalMs(),
 		    TimeUnit.MILLISECONDS);
 	}
-	influx.setLogLevel(convertLogLevel(getConfiguration().getLogLevel()));
+	getInflux().setLogLevel(convertLogLevel(getConfiguration().getLogLevel()));
     }
 
     /**
@@ -95,11 +102,11 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
 	return LogLevel.NONE;
     }
 
-    public InfluxConfiguration getConfiguration() {
+    public InfluxDbConfiguration getConfiguration() {
 	return configuration;
     }
 
-    public void setConfiguration(InfluxConfiguration configuration) {
+    public void setConfiguration(InfluxDbConfiguration configuration) {
 	this.configuration = configuration;
     }
 

@@ -7,10 +7,18 @@
  */
 package com.sitewhere.influxdb;
 
-public class InfluxConfiguration {
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sitewhere.microservice.configuration.json.JsonConfiguration;
+import com.sitewhere.spi.SiteWhereException;
+import com.sitewhere.spi.microservice.lifecycle.ITenantEngineLifecycleComponent;
+
+/**
+ * Manages properties used to configure an InfluxDB connection.
+ */
+public class InfluxDbConfiguration extends JsonConfiguration {
 
     /** Default hostname */
-    private static final String DEFAULT_HOSTNAME = "influxdb";
+    private static final String DEFAULT_HOSTNAME = "sitewhere-infrastructure-influxdb.sitewhere-system";
 
     /** Default port */
     private static final int DEFAULT_PORT = 8086;
@@ -22,7 +30,7 @@ public class InfluxConfiguration {
     private static final String DEFAULT_PASSWORD = "root";
 
     /** Default database */
-    private static final String DEFAULT_DATABASE = "sitewhere";
+    private static final String DEFAULT_DATABASE = "tenant_${tenant.id}";
 
     /** Default retention */
     private static final String DEFAULT_RETENTION = "autogen";
@@ -56,6 +64,21 @@ public class InfluxConfiguration {
 
     /** Log level */
     private String logLevel;
+
+    public InfluxDbConfiguration(ITenantEngineLifecycleComponent component) {
+	super(component);
+    }
+
+    public InfluxDbConfiguration loadFrom(JsonNode configuration) throws SiteWhereException {
+	InfluxDbConfiguration influx = new InfluxDbConfiguration(getComponent());
+	this.hostname = configurableString("hostname", configuration, DEFAULT_HOSTNAME);
+	this.port = configurableInt("port", configuration, DEFAULT_PORT);
+	this.username = configurableString("username", configuration, DEFAULT_USERNAME);
+	this.password = configurableString("password", configuration, DEFAULT_PASSWORD);
+	this.database = configurableString("database", configuration, DEFAULT_DATABASE);
+	this.retention = configurableString("retention", configuration, DEFAULT_RETENTION);
+	return influx;
+    }
 
     public String getHostname() {
 	return hostname;

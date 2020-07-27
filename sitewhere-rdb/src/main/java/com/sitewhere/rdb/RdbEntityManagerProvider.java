@@ -212,6 +212,9 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 		T result = callback.process();
 		transaction.commit();
 		return result;
+	    } catch (SiteWhereException e) {
+		getLogger().error("Exception in database transaction.", e);
+		throw e;
 	    } catch (Exception e) {
 		transaction.rollback();
 		getLogger().error("Transaction failed.", e);

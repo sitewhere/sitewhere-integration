@@ -7,12 +7,15 @@
  */
 package com.sitewhere.rdb.spi;
 
+import com.sitewhere.spi.SiteWhereException;
+
 public interface ITransactionCallback<T> {
 
     /**
      * Execute code in the context of a transaction.
      * 
      * @return
+     * @throws SiteWhereException
      */
-    T process();
+    T process() throws SiteWhereException;
 }

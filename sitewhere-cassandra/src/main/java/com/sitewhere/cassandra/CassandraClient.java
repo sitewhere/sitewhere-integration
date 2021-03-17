@@ -21,9 +21,7 @@ import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.QueryExecutionException;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
-import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 
 /**
@@ -41,33 +39,11 @@ public class CassandraClient extends TenantEngineLifecycleComponent {
     /** Cassandra session */
     private Session session;
 
-    /** Contact points parameter */
-    private ILifecycleComponentParameter<String> contactPoints;
-
-    /** Keyspace parameter */
-    private ILifecycleComponentParameter<String> keyspace;
-
     /** Bucket length in milliseconds */
     private long bucketLengthInMs = 60 * 60 * 1000;
 
     public CassandraClient(CassandraConfiguration configuration) {
 	this.configuration = configuration;
-    }
-
-    /*
-     * @see com.sitewhere.server.lifecycle.LifecycleComponent#initializeParameters()
-     */
-    @Override
-    public void initializeParameters() throws SiteWhereException {
-	// Add contact points.
-	this.contactPoints = StringComponentParameter.newBuilder(this, "Contact Points")
-		.value(getConfiguration().getContactPoints()).makeRequired().build();
-	getParameters().add(contactPoints);
-
-	// Add keyspace.
-	this.keyspace = StringComponentParameter.newBuilder(this, "Keyspace").value(getConfiguration().getKeyspace())
-		.makeRequired().build();
-	getParameters().add(keyspace);
     }
 
     /*
@@ -80,7 +56,7 @@ public class CassandraClient extends TenantEngineLifecycleComponent {
 	super.start(monitor);
 
 	// Verify that contact points were specified.
-	String[] contactPoints = getContactPoints().getValue().split(",");
+	String[] contactPoints = configuration.getContactPoints().split(",");
 	if (contactPoints.length == 0) {
 	    throw new SiteWhereException("No contact points specified for Cassandra cluster.");
 	}
@@ -128,22 +104,6 @@ public class CassandraClient extends TenantEngineLifecycleComponent {
 
     public void setConfiguration(CassandraConfiguration configuration) {
 	this.configuration = configuration;
-    }
-
-    public ILifecycleComponentParameter<String> getContactPoints() {
-	return contactPoints;
-    }
-
-    public void setContactPoints(ILifecycleComponentParameter<String> contactPoints) {
-	this.contactPoints = contactPoints;
-    }
-
-    public ILifecycleComponentParameter<String> getKeyspace() {
-	return keyspace;
-    }
-
-    public void setKeyspace(ILifecycleComponentParameter<String> keyspace) {
-	this.keyspace = keyspace;
     }
 
     public long getBucketLengthInMs() {

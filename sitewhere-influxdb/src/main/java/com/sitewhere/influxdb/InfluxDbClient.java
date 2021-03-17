@@ -24,9 +24,7 @@ import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
-import com.sitewhere.microservice.lifecycle.parameters.StringComponentParameter;
 import com.sitewhere.spi.SiteWhereException;
-import com.sitewhere.spi.microservice.lifecycle.ILifecycleComponentParameter;
 import com.sitewhere.spi.microservice.lifecycle.ILifecycleProgressMonitor;
 
 /**
@@ -40,30 +38,8 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
     /** InfluxDB handle */
     private InfluxDB influx;
 
-    /** Hostname parameter */
-    private ILifecycleComponentParameter<String> hostname;
-
-    /** Database parameter */
-    private ILifecycleComponentParameter<String> database;
-
     public InfluxDbClient(InfluxDbConfiguration configuration) {
 	this.configuration = configuration;
-    }
-
-    /*
-     * @see com.sitewhere.server.lifecycle.LifecycleComponent#initializeParameters()
-     */
-    @Override
-    public void initializeParameters() throws SiteWhereException {
-	// Add hostname.
-	this.hostname = StringComponentParameter.newBuilder(this, "Hostname").value(getConfiguration().getHostname())
-		.makeRequired().build();
-	getParameters().add(hostname);
-
-	// Add database.
-	this.database = StringComponentParameter.newBuilder(this, "Database").value(getConfiguration().getDatabase())
-		.makeRequired().build();
-	getParameters().add(database);
     }
 
     /*
@@ -75,20 +51,28 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
     public void initialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
 	super.initialize(monitor);
 
-	String connectionUrl = "http://" + getHostname().getValue() + ":" + getConfiguration().getPort();
+	String connectionUrl = "http://" + getConfiguration().getHostname() + ":" + getConfiguration().getPort();
 	this.influx = InfluxDBFactory.connect(connectionUrl, getConfiguration().getUsername(),
 		getConfiguration().getPassword());
+	getLogger().info(String.format("Connecting to InfluxDB using URL '%s' and database '%s'.", connectionUrl,
+		getConfiguration().getDatabase()));
 	QueryResult result = getInflux()
-		.query(new Query(String.format("CREATE DATABASE \"%s\";", getDatabase().getValue()), ""));
+		.query(new Query(String.format("CREATE DATABASE \"%s\";", getConfiguration().getDatabase()), ""));
 	String error = result.getError();
 	if (error != null) {
-	    getLogger().error(String.format("Error creating database. %s", error));
+	    throw new SiteWhereException(String.format("Unable to execute InfluxDB database create query: %s", error));
+	} else {
+	    getLogger().info("Connected successfully.");
 	}
 	if (getConfiguration().isEnableBatch()) {
+	    getLogger().info(String.format("InfluxDB batch mode enabled with interval set to %s ms.",
+		    String.valueOf(getConfiguration().getBatchIntervalMs())));
 	    getInflux().enableBatch(getConfiguration().getBatchChunkSize(), getConfiguration().getBatchIntervalMs(),
 		    TimeUnit.MILLISECONDS);
 	}
-	getInflux().setLogLevel(convertLogLevel(getConfiguration().getLogLevel()));
+	LogLevel level = convertLogLevel(getConfiguration().getLogLevel());
+	getInflux().setLogLevel(level);
+	getLogger().info(String.format("InfluxDB log level set to %s", level.name()));
     }
 
     /**
@@ -124,21 +108,5 @@ public class InfluxDbClient extends TenantEngineLifecycleComponent {
 
     public void setInflux(InfluxDB influx) {
 	this.influx = influx;
-    }
-
-    public ILifecycleComponentParameter<String> getHostname() {
-	return hostname;
-    }
-
-    public void setHostname(ILifecycleComponentParameter<String> hostname) {
-	this.hostname = hostname;
-    }
-
-    public ILifecycleComponentParameter<String> getDatabase() {
-	return database;
-    }
-
-    public void setDatabase(ILifecycleComponentParameter<String> database) {
-	this.database = database;
     }
 }

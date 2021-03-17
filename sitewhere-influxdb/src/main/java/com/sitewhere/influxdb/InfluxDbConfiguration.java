@@ -83,7 +83,7 @@ public class InfluxDbConfiguration extends JsonConfiguration {
 	this.port = configurableInt("port", configuration, DEFAULT_PORT);
 	this.username = configurableString("username", configuration, DEFAULT_USERNAME);
 	this.password = configurableString("password", configuration, DEFAULT_PASSWORD);
-	this.database = configurableString("database", configuration, DEFAULT_DATABASE);
+	this.database = configurableString("databaseName", configuration, DEFAULT_DATABASE);
 	this.retention = configurableString("retention", configuration, DEFAULT_RETENTION);
 	return influx;
     }

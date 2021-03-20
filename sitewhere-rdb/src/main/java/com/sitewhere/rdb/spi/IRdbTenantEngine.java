@@ -15,6 +15,7 @@
  */
 package com.sitewhere.rdb.spi;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import com.sitewhere.microservice.datastore.DatastoreDefinition;
@@ -54,11 +55,12 @@ public interface IRdbTenantEngine<T extends ITenantEngineConfiguration> extends 
     RdbPersistenceOptions getPersistenceOptions();
 
     /**
-     * Get classes managed by the {@link EntityManager}.
+     * Get base package of {@link Entity} classes managed by the
+     * {@link EntityManager}.
      * 
      * @return
      */
-    Class<?>[] getEntityClasses();
+    String getEntitiesBasePackage();
 
     /**
      * Get RDB entity manager provider.

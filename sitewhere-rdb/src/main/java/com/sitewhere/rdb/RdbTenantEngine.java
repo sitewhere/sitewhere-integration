@@ -15,6 +15,14 @@
  */
 package com.sitewhere.rdb;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.persistence.Entity;
+
+import org.reflections.Reflections;
+
 import com.sitewhere.microservice.configuration.model.instance.persistence.RdbConfiguration;
 import com.sitewhere.microservice.datastore.DatastoreDefinition;
 import com.sitewhere.microservice.lifecycle.CompositeLifecycleStep;
@@ -44,6 +52,17 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
 	super(tenantEngineResource);
     }
 
+    /**
+     * Performs a package scan to locate entity classes.
+     * 
+     * @return
+     */
+    protected Class<?>[] scanForEntityClasses() {
+	Reflections reflections = new Reflections(getEntitiesBasePackage());
+	Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
+	return entities.toArray(new Class<?>[0]);
+    }
+
     /*
      * @see com.sitewhere.spi.microservice.multitenant.IMicroserviceTenantEngine#
      * tenantInitialize(com.sitewhere.spi.microservice.lifecycle.
@@ -51,8 +70,14 @@ public abstract class RdbTenantEngine<T extends ITenantEngineConfiguration> exte
      */
     @Override
     public void tenantInitialize(ILifecycleProgressMonitor monitor) throws SiteWhereException {
+	// Find list of entities and print them to the log.
+	Class<?>[] entities = scanForEntityClasses();
+	String[] classNames = Arrays.asList(entities).stream().map(entityClass -> entityClass.getName())
+		.collect(Collectors.toList()).toArray(new String[0]);
+	getLogger().info(String.format("Entity manager detected the following entities under package '%s':\n%s",
+		getEntitiesBasePackage(), String.join(", ", classNames)));
 	this.rdbEntityManagerProvider = new RdbEntityManagerProvider(getProviderInformation(), getPersistenceOptions(),
-		getEntityClasses());
+		entities);
 
 	// Create step that will initialize components.
 	ICompositeLifecycleStep init = new CompositeLifecycleStep("Initialize RDB " + getComponentName());

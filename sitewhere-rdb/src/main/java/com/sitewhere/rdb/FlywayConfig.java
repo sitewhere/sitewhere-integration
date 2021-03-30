@@ -18,7 +18,9 @@ package com.sitewhere.rdb;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 
+import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.microservice.IFunctionIdentifier;
 
 public class FlywayConfig {
@@ -38,13 +40,17 @@ public class FlywayConfig {
      * 
      * @param dataSource
      * @param function
-     * @return
+     * @throws SiteWhereException
      */
-    public static boolean migrateTenantData(DataSource dataSource, IFunctionIdentifier function) {
+    public static void migrateTenantData(DataSource dataSource, IFunctionIdentifier function)
+	    throws SiteWhereException {
 	String area = getSchemaName(function);
 	Flyway flyway = Flyway.configure().locations(String.format("db/migrations/tenants/%s", area))
 		.dataSource(dataSource).schemas(area).load();
-	int migrate = flyway.migrate();
-	return (migrate > 0);
+	try {
+	    flyway.migrate();
+	} catch (FlywayException e) {
+	    throw new SiteWhereException("Flyway migration failed.", e);
+	}
     }
 }

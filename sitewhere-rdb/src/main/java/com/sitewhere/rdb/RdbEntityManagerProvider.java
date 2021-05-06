@@ -47,6 +47,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.sitewhere.microservice.lifecycle.TenantEngineLifecycleComponent;
 import com.sitewhere.rdb.spi.IRdbEntityManagerProvider;
 import com.sitewhere.rdb.spi.IRdbQueryProvider;
+import com.sitewhere.rdb.spi.IRdbTenantEngine;
 import com.sitewhere.rdb.spi.ITransactionCallback;
 import com.sitewhere.rest.model.search.SearchResults;
 import com.sitewhere.spi.SiteWhereException;
@@ -123,7 +124,8 @@ public class RdbEntityManagerProvider extends TenantEngineLifecycleComponent imp
 	getDataSource().setMaxPoolSize(getProvider().getConnectionInfo().getMaxConnections());
 
 	// Execute Flyway migration.
-	FlywayConfig.migrateTenantData(getDataSource(), getMicroservice().getIdentifier());
+	FlywayConfig.migrateTenantData(((IRdbTenantEngine<?>) getTenantEngine()), getDataSource(),
+		getMicroservice().getIdentifier());
 
 	// Create a new factory and entity manager.
 	List<Class<?>> entityClasses = Arrays.asList(getEntityClasses());

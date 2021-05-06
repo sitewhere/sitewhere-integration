@@ -1,10 +1,14 @@
 description = 'SiteWhere InfluxDB Library'
 
+apply plugin: 'java-library'
 dependencies {
 	// SiteWhere microservice library.	
-    compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
+    implementation "com.sitewhere:sitewhere-microservice:${rootProject.ext['sitewhere.microservice.api.version']}"
     
-    compile group: 'org.influxdb', name: 'influxdb-java', version:'2.19'
+    api('org.influxdb:influxdb-java') {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        exclude group: 'com.squareup.okhttp3', module: 'logging-interceptor'
+    }
 }
 
 task sourcesJar(type: Jar) {

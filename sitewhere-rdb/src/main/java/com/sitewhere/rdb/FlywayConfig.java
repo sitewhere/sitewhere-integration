@@ -15,15 +15,31 @@
  */
 package com.sitewhere.rdb;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.sitewhere.rdb.spi.IRdbTenantEngine;
 import com.sitewhere.spi.SiteWhereException;
 import com.sitewhere.spi.microservice.IFunctionIdentifier;
 
 public class FlywayConfig {
+
+    /** Static logger instance */
+    private static Logger LOGGER = LoggerFactory.getLogger(FlywayConfig.class);
+
+    /** Flyway migrations folder on filesystem */
+    private static final String FLYWAY_DIR = "/workspace/sitewhere/flyway/migrations";
 
     /**
      * Convert a function identifier into a schema name.
@@ -42,15 +58,32 @@ public class FlywayConfig {
      * @param function
      * @throws SiteWhereException
      */
-    public static void migrateTenantData(DataSource dataSource, IFunctionIdentifier function)
-	    throws SiteWhereException {
+    public static void migrateTenantData(IRdbTenantEngine<?> engine, DataSource dataSource,
+	    IFunctionIdentifier function) throws SiteWhereException {
 	String area = getSchemaName(function);
-	Flyway flyway = Flyway.configure().locations(String.format("db/migrations/tenants/%s", area))
-		.dataSource(dataSource).schemas(area).load();
 	try {
+	    Path migrations = Files.createDirectories(Paths.get(FLYWAY_DIR));
+	    for (String resourceName : engine.getFlywayMigrations()) {
+		InputStream resourceStream = Thread.currentThread().getContextClassLoader()
+			.getResourceAsStream(String.format("db/migrations/%s", resourceName));
+		if (resourceStream == null) {
+		    LOGGER.warn(String.format("Migration not found for '%s'. Skipping.", resourceName));
+		    continue;
+		}
+		Path target = migrations.resolve(resourceName);
+		if (!Files.exists(target)) {
+		    LOGGER.info(String.format("Copying migration resource to: %s", target.toString()));
+		    Files.copy(resourceStream, target, StandardCopyOption.REPLACE_EXISTING);
+		}
+	    }
+
+	    Flyway flyway = Flyway.configure().locations(String.format("filesystem:%s", migrations.toString()))
+		    .dataSource(dataSource).schemas(area).load();
 	    flyway.migrate();
 	} catch (FlywayException e) {
 	    throw new SiteWhereException("Flyway migration failed.", e);
+	} catch (IOException e) {
+	    throw new SiteWhereException("Unable to bootstrap migrations to filesystem.", e);
 	}
     }
 }

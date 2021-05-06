@@ -1,8 +1,11 @@
 description = 'SiteWhere RDB Implementation'
 
+apply plugin: 'java-library'
 dependencies {
     // Include JPA dependencies.
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    api group: 'jakarta.persistence', name: 'jakarta.persistence-api'
+    api group: 'jakarta.transaction', name: 'jakarta.transaction-api'
+    api group: 'org.hibernate', name: 'hibernate-core'
     
 	// SiteWhere microservice library.
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
@@ -11,13 +14,10 @@ dependencies {
     compile group: 'org.flywaydb', name: 'flyway-core'
     
     // PostgreSQL driver.
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'org.postgresql', name: 'postgresql'
     
     // Connection pool.
     compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
-    
-    // Annotation reflection support.
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 }
 
 task sourcesJar(type: Jar) {

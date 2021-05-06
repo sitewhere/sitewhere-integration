@@ -1,0 +1,34 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "org/flywaydb/core/internal/version.txt"
+      },
+      {
+        "pattern": "org/hibernate/jpa/.*xsd"
+      },
+      {
+        "pattern": "org/hibernate/xsd/.*xsd"
+      },
+      {
+        "pattern": "org/hibernate/.*dtd"
+      },
+      {
+        "pattern": "org/hibernate/.*xsd"
+      },
+      {
+        "pattern": "mchange-config-resource-paths.txt"
+      },
+      {
+        "pattern": "mchange-commons.properties"
+      },
+      {
+        "pattern": "mchange-log.properties"
+      },
+      {
+        "pattern": "c3p0.properties"
+      }
+    ]
+  },
+  "bundles": []
+}

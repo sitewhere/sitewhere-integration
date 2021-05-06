@@ -55,12 +55,18 @@ public interface IRdbTenantEngine<T extends ITenantEngineConfiguration> extends 
     RdbPersistenceOptions getPersistenceOptions();
 
     /**
-     * Get base package of {@link Entity} classes managed by the
-     * {@link EntityManager}.
+     * Get {@link Entity} classes to be managed by the {@link EntityManager}.
      * 
      * @return
      */
-    String getEntitiesBasePackage();
+    Class<?>[] getEntityClasses();
+
+    /**
+     * Get list of flyway resource names.
+     * 
+     * @return
+     */
+    String[] getFlywayMigrations();
 
     /**
      * Get RDB entity manager provider.

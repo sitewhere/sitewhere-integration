@@ -4,7 +4,6 @@ dependencies {
 	// SiteWhere microservice library.	
     compile group: 'com.sitewhere', name: 'sitewhere-microservice', version: "${rootProject.ext['sitewhere.microservice.api.version']}"
     
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.0'
     compile 'com.google.code.gson:gson:2.8.6'
 }
 
